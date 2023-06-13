@@ -1,15 +1,13 @@
 module.exports = {
   env: {
     browser: true,
-    es2021: true
+    es2021: true,
   },
-  plugins: [
-    '@typescript-eslint',
-    'prettier',
-  ],
+  plugins: ['@typescript-eslint', 'prettier'],
   extends: [
     'prettier',
     'plugin:prettier/recommended',
+    'airbnb-base',
     'standard-with-typescript',
     'airbnb-typescript/base',
     'plugin:@typescript-eslint/recommended',
@@ -18,8 +16,8 @@ module.exports = {
   parserOptions: {
     ecmaVersion: 'latest',
     sourceType: 'module',
-    tsconfigRootDir: __dirname,
     project: './tsconfig.json',
+    tsconfigRootDir: __dirname,
   },
   rules: {
     'no-console': 'off',
@@ -34,17 +32,14 @@ module.exports = {
           constructors: 'off',
           methods: 'explicit',
           properties: 'explicit',
-          parameterProperties: 'explicit'
-        }
-      }
+          parameterProperties: 'explicit',
+        },
+      },
     ],
-    'max-lines-per-function': [
-      'error',
-      40
-    ],
+    'max-lines-per-function': ['error', 40],
     '@typescript-eslint/explicit-function-return-type': 'error',
     '@typescript-eslint/no-unnecessary-type-assertion': 'error',
-    '@typescript-eslint/no-non-null-assertion': 'error'
+    '@typescript-eslint/no-non-null-assertion': 'error',
+    'prettier/prettier': ['error', { singleQuote: true }],
   },
-  ignorePattern: 'webpack.config.js'
-}
+};
