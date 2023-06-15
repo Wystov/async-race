@@ -1,0 +1,7 @@
+@import './utils/normalize.css';
+
+.container {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 1fr 3fr;
+}

@@ -1,3 +1,4 @@
+import './_game.scss';
 import { ElementCreator } from '../../utils/element-creator';
 import { Visualizer } from './visualizer/visualizer';
 import { StyleEditor } from './style-editor/style-editor';

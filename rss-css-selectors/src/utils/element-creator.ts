@@ -7,11 +7,13 @@ export class ElementCreator {
     tagName = 'div',
     classes = [],
     innerHTML = '',
+    textContent = '',
     parent = null,
   }: Partial<BaseElementOptions>) {
     this.#node = document.createElement(tagName);
     this.#node.classList.add(...classes);
     if (innerHTML.length > 0) this.#node.innerHTML = innerHTML;
+    if (textContent.length > 0) this.#node.textContent = textContent;
     if (parent instanceof HTMLElement) parent.append(this.#node);
   }
 

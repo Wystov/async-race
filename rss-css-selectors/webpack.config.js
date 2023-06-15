@@ -16,6 +16,17 @@ const config = {
   devServer: {
     open: true,
     host: 'localhost',
+    client: {
+      overlay: {
+        errors: false,
+        warnings: false,
+        runtimeErrors: false,
+      },
+    },
+    static: {
+      directory: path.join(__dirname, 'src'),
+      watch: true,
+    },
   },
   plugins: [
     new HtmlWebpackPlugin({
