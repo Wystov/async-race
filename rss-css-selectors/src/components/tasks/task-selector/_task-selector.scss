@@ -1,6 +1,57 @@
 .selector {
 
+  &__title {
+    margin-bottom: 10px;
+  }
+
+  &__header {
+    cursor: pointer;
+    display: flex;
+    gap: 5px;
+    transition: background-color 0.2s;
+
+    &:hover {
+      background-color: #414141;
+    }
+  }
+
+  &__arrow {
+    height: 24px;
+    width: 24px;
+    background-image: url('../../../assets/icons/arrow.svg');
+    background-size: contain;
+    transition: transform 0.5s;
+
+    &--active {
+      transform: rotate(90deg);
+    }
+  }
+
+  &__levels {
+    overflow: hidden;
+    margin: 0;
+    margin-left: 12px;
+    padding: 0;
+    list-style-type: none;
+    border-left: 1px solid #414141;
+    transition: max-height 0.5s;
+  }
+
   &__level {
     cursor: pointer;
+    padding-left: 24px;
+    transition: background-color 0.2s;
+
+    &::before {
+      content: '·';
+      position: relative;
+      right: 8px;
+      font-weight: bold;
+    }
+
+
+    &:hover {
+      background-color: #414141;
+    }
   }
 }

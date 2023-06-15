@@ -42,6 +42,11 @@ export class TaskSelector {
       classes: ['selector__levels'],
       parent: this.section,
     }).getNode();
+    this.elements.levelList.setAttribute('style', 'max-height: 0px');
+    this.elements.header.addEventListener(
+      'click',
+      this.toggleLevelList.bind(this)
+    );
     this.elements.levelList.addEventListener(
       'click',
       this.changeLevel.bind(this)
@@ -62,9 +67,30 @@ export class TaskSelector {
   }
 
   private changeLevel(e: Event): void {
+    const { levelList, current } = this.elements;
     if (e.target instanceof HTMLElement && e.target.textContent !== null) {
-      this.elements.current.textContent = e.target.textContent;
+      if (
+        levelList.getAttribute('style') ===
+        `max-height: ${levelList.scrollHeight}px`
+      ) {
+        this.toggleLevelList();
+      }
+      current.textContent = e.target.textContent;
       this.emitter.emit('change-level', e.target.textContent);
     }
+  }
+
+  private toggleLevelList(): void {
+    const { levelList, arrow } = this.elements;
+    const isClosed = levelList.getAttribute('style') === 'max-height: 0px';
+    if (isClosed) {
+      levelList.setAttribute(
+        'style',
+        `max-height: ${levelList.scrollHeight}px`
+      );
+    } else {
+      levelList.setAttribute('style', 'max-height: 0px');
+    }
+    arrow.classList.toggle('selector__arrow--active');
   }
 }

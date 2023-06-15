@@ -1,7 +1,12 @@
 @import './utils/normalize.css';
+@import url('https://fonts.googleapis.com/css2?family=Fira+Sans:ital,wght@0,400;0,700;1,400&display=swap');
 
 .container {
   min-height: 100vh;
   display: grid;
   grid-template-columns: 1fr 3fr;
+  color: #dee3e7;
+  font-family: 'Fira Sans', sans-serif;
+  line-height: 1.5;
+  user-select: none;
 }

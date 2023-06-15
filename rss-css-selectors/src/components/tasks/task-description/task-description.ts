@@ -1,3 +1,4 @@
+import './_task-description.scss';
 import { ElementCreator } from '../../../utils/element-creator';
 import { levelsData } from '../../../data/levels';
 import type { EventEmitter } from '../../../utils/event-emitter';
