@@ -40,6 +40,14 @@ module.exports = {
     '@typescript-eslint/explicit-function-return-type': 'error',
     '@typescript-eslint/no-unnecessary-type-assertion': 'error',
     '@typescript-eslint/no-non-null-assertion': 'error',
+    '@typescript-eslint/no-extraneous-class': 'off',
+    'class-methods-use-this': 'off',
+    '@typescript-eslint/comma-dangle': 'off',
+    '@typescript-eslint/lines-between-class-members': 'off',
+    '@typescript-eslint/member-delimiter-style': [
+      'error',
+      { multiline: { delimiter: 'semi' } },
+    ],
     'prettier/prettier': ['error', { singleQuote: true }],
   },
 };

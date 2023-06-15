@@ -8,10 +8,8 @@
     "noImplicitAny": true,
     "skipLibCheck": true
   },
-  "files": [
-    "src/index.ts"
-  ],
   "include": [
+    "src/**/*.ts",
     ".eslintrc.js",
     "webpack.config.js"
   ]
