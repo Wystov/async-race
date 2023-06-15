@@ -1,11 +1,16 @@
+import './_task-selector.scss';
 import { ElementCreator } from '../../../utils/element-creator';
 import { levelsData } from '../../../data/levels';
+import type { EventEmitter } from '../../../utils/event-emitter';
 
 export class TaskSelector {
   private readonly section: HTMLElement;
   private readonly elements: Record<string, HTMLElement> = {};
+  private readonly emitter: EventEmitter;
+  private readonly levels: HTMLElement[] = [];
 
-  constructor(parent: HTMLElement) {
+  constructor(parent: HTMLElement, emitter: EventEmitter) {
+    this.emitter = emitter;
     this.section = new ElementCreator({
       classes: ['selector', 'task__selector'],
     }).getNode();
@@ -32,22 +37,34 @@ export class TaskSelector {
       parent: this.elements.header,
       textContent: 'Level 1',
     }).getNode();
-    this.elements.levels = new ElementCreator({
+    this.elements.levelList = new ElementCreator({
       tagName: 'ul',
       classes: ['selector__levels'],
       parent: this.section,
     }).getNode();
+    this.elements.levelList.addEventListener(
+      'click',
+      this.changeLevel.bind(this)
+    );
     this.fillLevels();
   }
 
   private fillLevels(): void {
     levelsData.forEach((_, index) => {
-      const level = new ElementCreator({
+      const lvlElement = new ElementCreator({
         tagName: 'li',
-        textContent: `Level ${index + 1}`,
+        textContent: `${index + 1} level`,
         classes: ['selector__level'],
       }).getNode();
-      this.elements.levels.append(level);
+      this.levels.push(lvlElement);
+      this.elements.levelList.append(lvlElement);
     });
+  }
+
+  private changeLevel(e: Event): void {
+    if (e.target instanceof HTMLElement && e.target.textContent !== null) {
+      this.elements.current.textContent = e.target.textContent;
+      this.emitter.emit('change-level', e.target.textContent);
+    }
   }
 }
