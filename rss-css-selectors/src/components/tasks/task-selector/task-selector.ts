@@ -19,6 +19,12 @@ export class TaskSelector {
   }
 
   private init(): void {
+    this.createElements();
+    this.addListeners();
+    this.fillLevels();
+  }
+
+  private createElements(): void {
     this.elements.title = new ElementCreator({
       classes: ['selector__title'],
       textContent: 'RSS CSS Selectors',
@@ -35,7 +41,6 @@ export class TaskSelector {
     this.elements.current = new ElementCreator({
       classes: ['selector__current'],
       parent: this.elements.header,
-      textContent: 'Level 1',
     }).getNode();
     this.elements.levelList = new ElementCreator({
       tagName: 'ul',
@@ -43,15 +48,18 @@ export class TaskSelector {
       parent: this.section,
     }).getNode();
     this.elements.levelList.setAttribute('style', 'max-height: 0px');
+  }
+
+  private addListeners(): void {
     this.elements.header.addEventListener(
       'click',
       this.toggleLevelList.bind(this)
     );
     this.elements.levelList.addEventListener(
       'click',
-      this.changeLevel.bind(this)
+      this.onClickChangeLevel.bind(this)
     );
-    this.fillLevels();
+    this.emitter.on('change-level', this.changeLevel.bind(this));
   }
 
   private fillLevels(): void {
@@ -66,16 +74,19 @@ export class TaskSelector {
     });
   }
 
-  private changeLevel(e: Event): void {
-    const { levelList, current } = this.elements;
+  private changeLevel(data: string): void {
+    this.elements.current.textContent = `${parseInt(data, 10)} level`;
+  }
+
+  private onClickChangeLevel(e: Event): void {
     if (e.target instanceof HTMLElement && e.target.textContent !== null) {
+      const { levelList } = this.elements;
       if (
         levelList.getAttribute('style') ===
         `max-height: ${levelList.scrollHeight}px`
       ) {
         this.toggleLevelList();
       }
-      current.textContent = e.target.textContent;
       this.emitter.emit('change-level', e.target.textContent);
     }
   }

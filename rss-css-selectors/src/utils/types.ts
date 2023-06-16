@@ -5,3 +5,7 @@ export interface BaseElementOptions {
   innerHTML?: string;
   parent?: HTMLElement | null;
 }
+
+export interface StateData {
+  level: number;
+}
