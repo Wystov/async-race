@@ -33,8 +33,8 @@ export class TaskDescription {
     });
   }
 
-  private changeLevel(elementTextContent: string): void {
-    const targetLvl = parseInt(elementTextContent, 10) - 1;
+  private changeLevel(data: string): void {
+    const targetLvl = parseInt(data, 10) - 1;
     const { title, description } = this.elements;
     title.textContent = levelsData[targetLvl].title;
     description.textContent = levelsData[targetLvl].description;

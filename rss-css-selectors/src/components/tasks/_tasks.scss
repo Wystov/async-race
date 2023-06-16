@@ -1,7 +1,7 @@
 .task {
   display: flex;
   flex-direction: column;
-  background-color: #0b0f18;
+  border-right: 1px solid #414141;
 
   &__selector,
   &__description {

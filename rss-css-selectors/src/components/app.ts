@@ -13,7 +13,7 @@ export class App {
     this.emitter = new EventEmitter();
     this.root = new ElementCreator({ classes: ['container'] }).getNode();
     this.task = new Tasks(this.root, this.emitter);
-    this.game = new Game(this.root);
+    this.game = new Game(this.root, this.emitter);
 
     document.body.append(this.root);
   }
