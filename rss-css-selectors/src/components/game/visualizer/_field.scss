@@ -1,0 +1,36 @@
+.field {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  max-width: 80%;
+  border: 2px solid #dee3e7;
+  padding: 20px 40px;
+}
+
+.select-me {
+  animation: select-me 0.5s ease-in infinite;
+}
+
+.element-selected {
+  animation: element-selected 1s ease-in-out forwards;
+}
+
+square,
+circle {
+  width: 20px;
+  height: 20px;
+  outline: 2px solid #dee3e7;
+  outline-offset: -2px;
+  margin: 10px;
+}
+
+
+circle {
+  border-radius: 20px;
+}
+
+
+.red {
+  background-color: #cf3b47;
+  outline: none;
+}

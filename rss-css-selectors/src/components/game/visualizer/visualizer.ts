@@ -38,6 +38,9 @@ export class Visualizer {
       classes: ['visualizer__view-container'],
       parent: this.elements.body,
     }).getNode();
+    this.emitter.on('correct-selector', (lvl: number) => {
+      this.setAnimation.bind(this)(lvl, 'element-selected');
+    });
   }
 
   private changeLevel(data: string): void {
@@ -47,5 +50,15 @@ export class Visualizer {
     if (typeof markup === 'string') {
       this.elements.viewContainer.innerHTML = markup;
     }
+    this.setAnimation(targetLvl, 'select-me');
+  }
+
+  private setAnimation(lvl: number, className: string): void {
+    const targetElements = this.elements.viewContainer.querySelectorAll(
+      `${levelsData[lvl].selector}`
+    );
+    targetElements.forEach((el) => {
+      el.classList.add(className);
+    });
   }
 }

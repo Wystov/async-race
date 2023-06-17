@@ -1,3 +1,6 @@
+@import './_field';
+@import './_animation';
+
 .visualizer {
 
   &__title {
@@ -24,5 +27,12 @@
     margin-top: 20px;
     text-align: center;
     font-size: 24px;
+  }
+
+  &__view-container {
+    height: 75%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
 }

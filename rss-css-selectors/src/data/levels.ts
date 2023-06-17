@@ -1,33 +1,24 @@
 export const levelsData = [
   {
-    title: 'Level 1 title',
-    description: 'select dots',
-    task: 'make this 1',
+    title: 'Tag selector',
+    description:
+      'With tag selector you can select all elements that match tag name.',
+    task: 'Select all <circle> elements',
     html: `<div class='field'>
-  <dot></dot>
-  <dot></dot>
+  <circle></circle>
+  <square></square>
+  <circle></circle>
 </div>`,
-    selector: 'dot',
+    selector: 'circle',
   },
   {
     title: 'Level 2 title',
     description: 'description 2',
-    task: 'select red dot',
+    task: 'select red circle',
     html: `<div class='field'>
-  <dot class='red'></dot>
-  <dot></dot>
+  <circle class='red'></circle>
+  <circle></circle>
 </div>`,
     selector: '.red',
-  },
-  {
-    title: 'Level 3 title',
-    description: 'description 3',
-    task: 'select blue dot inside red dot',
-    html: `<div class='field'>
-  <dot>
-    <dot class='blue'></dot>
-  </dot>
-</div>`,
-    selector: '.blue',
   },
 ];

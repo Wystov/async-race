@@ -46,12 +46,6 @@ export class StyleEditor {
       textContent: 'Submit',
       parent: this.elements.body,
     }).getNode();
-    setInterval(this.inputStrobe.bind(this), 530);
-  }
-
-  private inputStrobe(): void {
-    this.elements.input.classList.toggle('style-editor__input--strobe');
-    this.elements.input.focus();
   }
 
   private addListeners(): void {
@@ -81,11 +75,14 @@ export class StyleEditor {
 
     const isEqual = this.compareElements(userSelectedElements, correctElements);
     if (!isEqual) {
+      this.showEffect('wrong-selector');
       console.log('wrong selector');
       return;
     }
+    this.showEffect('correct-selector');
     console.log('correct selector');
     input.value = '';
+    this.emitter.emit('correct-selector', this.currentLevelIndex);
     if (this.currentLevelIndex < levelsData.length - 1) {
       setTimeout(() => {
         this.emitter.emit('change-level', this.currentLevelIndex + 2);
@@ -106,5 +103,19 @@ export class StyleEditor {
       return true;
     }
     return false;
+  }
+
+  private showEffect(effect: string): void {
+    const value = effect === 'wrong-selector' ? '🗙' : '✓';
+    this.elements.sumbitBtn.classList.toggle(
+      `style-editor__submit-btn--${effect}`
+    );
+    this.elements.sumbitBtn.textContent = value;
+    setTimeout(() => {
+      this.elements.sumbitBtn.classList.toggle(
+        `style-editor__submit-btn--${effect}`
+      );
+      this.elements.sumbitBtn.textContent = 'Submit';
+    }, 800);
   }
 }
