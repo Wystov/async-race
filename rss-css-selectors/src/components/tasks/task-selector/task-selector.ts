@@ -27,7 +27,7 @@ export class TaskSelector {
   private createElements(): void {
     this.elements.title = new ElementCreator({
       classes: ['selector__title'],
-      textContent: 'RSS CSS Selectors',
+      textContent: 'CSS mind-breaker',
       parent: this.section,
     }).getNode();
     this.elements.header = new ElementCreator({

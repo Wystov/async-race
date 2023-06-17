@@ -1,3 +1,5 @@
+@import './shape-vars';
+
 .field {
   display: flex;
   justify-content: center;
@@ -15,13 +17,34 @@
   animation: element-selected 1s ease-in-out forwards;
 }
 
+.red {
+  background-color: #cf3b47;
+  outline: none;
+}
+
+.blue {
+  background-color: #3b79cf;
+  outline: none;
+}
+
+.green {
+  background-color: #3aba2e;
+  outline: none;
+}
+
 square,
-circle {
-  width: 20px;
-  height: 20px;
+circle,
+underscore {
+  width: 30px;
+  height: 30px;
   outline: 2px solid #dee3e7;
   outline-offset: -2px;
-  margin: 10px;
+  margin: 12px;
+}
+
+underscore {
+  outline: none;
+  border-bottom: 2px solid #dee3e7;
 }
 
 
@@ -29,8 +52,32 @@ circle {
   border-radius: 20px;
 }
 
+triangle {
+  width: 30px;
+  height: 30px;
+  margin: 12px;
+  background-image: $triangle;
+  background-size: contain;
 
-.red {
-  background-color: #cf3b47;
-  outline: none;
+  &.red {
+    background-color: transparent;
+    background-image: $triangle-red;
+  }
+
+  &.green {
+    background-color: transparent;
+    background-image: $triangle-green;
+  }
+
+  &.blue {
+    background-color: transparent;
+    background-image: $triangle-blue;
+  }
+}
+
+border {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 2px dashed #dee3e7;
 }
