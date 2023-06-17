@@ -1,7 +1,7 @@
-.html-viewer {
+.visualizer {
 
   &__title {
-    margin-top: 7px;
+    margin-top: 15px;
     position: relative;
     z-index: 5;
     top: 1px;
@@ -13,16 +13,16 @@
   }
 
   &__body {
-    height: calc(100% - 43px);
+    height: calc(100% - 50px);
     background-color: #131924;
     border-top: 1px solid #414141;
     border-left: 1px solid #414141;
+    border-bottom: 1px solid #414141;
   }
 
-  &__code {
-    margin: 0;
-    padding: 20px;
-    user-select: text;
-    background-color: #131924;
+  &__task {
+    margin-top: 20px;
+    text-align: center;
+    font-size: 24px;
   }
 }

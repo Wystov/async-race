@@ -4,8 +4,8 @@ export const levelsData = [
     description: 'select dots',
     task: 'make this 1',
     html: `<div class='field'>
-    <dot></dot>
-    <dot></dot>
+  <dot></dot>
+  <dot></dot>
 </div>`,
     selector: 'dot',
   },
@@ -14,8 +14,8 @@ export const levelsData = [
     description: 'description 2',
     task: 'select red dot',
     html: `<div class='field'>
-    <dot class='red'></dot>
-     <dot></dot>
+  <dot class='red'></dot>
+  <dot></dot>
 </div>`,
     selector: '.red',
   },
@@ -24,9 +24,9 @@ export const levelsData = [
     description: 'description 3',
     task: 'select blue dot inside red dot',
     html: `<div class='field'>
-    <dot>
-        <dot class='blue'></dot>
-    </dot>
+  <dot>
+    <dot class='blue'></dot>
+  </dot>
 </div>`,
     selector: '.blue',
   },

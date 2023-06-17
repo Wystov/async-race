@@ -1,6 +1,7 @@
 import { ElementCreator } from '../../../utils/element-creator';
 import type { EventEmitter } from '../../../utils/event-emitter';
 import { levelsData } from '../../../data/levels';
+import './_style-editor.scss';
 
 export class StyleEditor {
   private readonly section;
@@ -38,12 +39,19 @@ export class StyleEditor {
       parent: this.elements.body,
     }).getNode();
     this.elements.input.setAttribute('type', 'text');
+    this.elements.input.setAttribute('placeholder', 'Type in CSS selector');
     this.elements.sumbitBtn = new ElementCreator({
       tagName: 'button',
       classes: ['style-editor__submit-btn'],
       textContent: 'Submit',
       parent: this.elements.body,
     }).getNode();
+    setInterval(this.inputStrobe.bind(this), 530);
+  }
+
+  private inputStrobe(): void {
+    this.elements.input.classList.toggle('style-editor__input--strobe');
+    this.elements.input.focus();
   }
 
   private addListeners(): void {

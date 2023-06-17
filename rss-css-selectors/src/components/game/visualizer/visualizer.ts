@@ -1,6 +1,7 @@
 import { ElementCreator } from '../../../utils/element-creator';
 import type { EventEmitter } from '../../../utils/event-emitter';
 import { levelsData } from '../../../data/levels';
+import './_visualizer.scss';
 
 export class Visualizer {
   private readonly section;

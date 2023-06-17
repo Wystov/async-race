@@ -1,9 +1,9 @@
 .game {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  grid-template-rows: 1.5fr 2fr;
-}
+  grid-template-rows: 1.5fr 2.5fr;
 
-.game__visualizer {
-  grid-column: span 2;
+  &__visualizer {
+    grid-column: span 2;
+  }
 }

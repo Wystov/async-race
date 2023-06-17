@@ -1,0 +1,58 @@
+.style-editor {
+
+  &__title {
+    margin-top: 7px;
+    position: relative;
+    z-index: 5;
+    top: 1px;
+    display: inline-block;
+    padding: 5px 20px;
+    background-color: #131924;
+    border: 1px solid #414141;
+    border-bottom: none;
+  }
+
+  &__body {
+    position: relative;
+    padding: 20px;
+    height: calc(100% - 83px);
+    background-color: #131924;
+    border-top: 1px solid #414141;
+    border-left: 1px solid #414141;
+  }
+
+  &__input {
+    min-width: 200px;
+    width: 90%;
+    padding: 5px 10px;
+    color: #dee3e7;
+    outline: none;
+    border: none;
+    background-color: #131924;
+
+    &--strobe {
+      background-color: #1c2029;
+    }
+  }
+
+  &__submit-btn {
+    position: absolute;
+    z-index: 5;
+    top: 21px;
+    right: 20px;
+    cursor: pointer;
+    padding: 4px 9px;
+    color: #0b0f18;
+    background-color: #dee3e7;
+    border: none;
+    transition: 0.3s;
+
+    &:hover {
+      background-color: #adb1b4;
+    }
+
+    &:active {
+      transform: translateY(4px);
+    }
+  }
+}
