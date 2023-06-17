@@ -46,6 +46,15 @@ export class StyleEditor {
       textContent: 'Submit',
       parent: this.elements.body,
     }).getNode();
+    this.elements.helpBtn = new ElementCreator({
+      tagName: 'button',
+      classes: ['style-editor__help-btn'],
+      textContent: 'Help',
+      parent: this.elements.body,
+    }).getNode();
+    this.elements.overlay = new ElementCreator({
+      parent: document.body,
+    }).getNode();
   }
 
   private addListeners(): void {
@@ -53,6 +62,7 @@ export class StyleEditor {
       'click',
       this.checkInput.bind(this)
     );
+    this.elements.helpBtn.addEventListener('click', this.showHelp.bind(this));
     this.elements.input.addEventListener('keyup', (e) => {
       if (e.key === 'Enter') {
         this.elements.sumbitBtn.click();
@@ -86,6 +96,7 @@ export class StyleEditor {
     if (this.currentLevelIndex < levelsData.length - 1) {
       setTimeout(() => {
         this.emitter.emit('change-level', this.currentLevelIndex + 2);
+        this.elements.overlay.classList.remove('overlay');
       }, 1000);
     }
   }
@@ -117,5 +128,25 @@ export class StyleEditor {
       );
       this.elements.sumbitBtn.textContent = 'Submit';
     }, 800);
+  }
+
+  private showHelp(): void {
+    this.elements.overlay.classList.add('overlay');
+    const { selector } = levelsData[this.currentLevelIndex];
+    const { input, sumbitBtn } = this.elements;
+    if (!(input instanceof HTMLInputElement)) return;
+    let i = 0;
+    const typeEffect = (): void => {
+      if (i < selector.length) {
+        input.value += selector[i];
+        i++;
+        setTimeout(typeEffect, 75);
+        return;
+      }
+      setTimeout(() => {
+        sumbitBtn.click();
+      }, 1500);
+    };
+    typeEffect();
   }
 }

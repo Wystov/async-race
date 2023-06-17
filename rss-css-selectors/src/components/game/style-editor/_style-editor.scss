@@ -24,6 +24,8 @@
   }
 
   &__input {
+    font-family: monospace;
+    font-size: 16px;
     min-width: 200px;
     width: 90%;
     padding: 5px 10px;
@@ -34,7 +36,8 @@
     animation: strobe 0.5s infinite;
   }
 
-  &__submit-btn {
+  &__submit-btn,
+  &__help-btn {
     position: absolute;
     z-index: 5;
     top: 21px;
@@ -57,5 +60,9 @@
       background-color: #5bcf3b;
       animation: correct-selector 0.8s;
     }
+  }
+
+  &__help-btn {
+    top: 101px;
   }
 }
