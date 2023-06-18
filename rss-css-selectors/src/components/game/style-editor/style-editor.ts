@@ -131,6 +131,8 @@ export class StyleEditor {
   }
 
   private showHelp(): void {
+    if (this.currentLevelIndex + 1 === levelsData.length) return;
+    this.showEffect('help');
     this.elements.overlay.classList.add('overlay');
     const { selector } = levelsData[this.currentLevelIndex];
     const { input, sumbitBtn } = this.elements;

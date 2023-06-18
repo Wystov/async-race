@@ -140,4 +140,11 @@ export const levelsData = [
     html: '<h1>And you should keep dreeming !</h1>',
     selector: 'h1',
   },
+  {
+    title: 'Final message',
+    description: '',
+    task: "That's all for now. Thanks for playing! See ya.",
+    html: '¯\\_(ツ)_/¯',
+    selector: 'h1',
+  },
 ];

@@ -63,7 +63,8 @@ export class TaskSelector {
   }
 
   private fillLevels(): void {
-    levelsData.forEach((_, index) => {
+    levelsData.forEach((data, index) => {
+      if (data.title === 'Final message') return;
       const lvlElement = new ElementCreator({
         tagName: 'li',
         textContent: `${index + 1} level`,
@@ -75,7 +76,9 @@ export class TaskSelector {
   }
 
   private changeLevel(data: string): void {
-    this.elements.current.textContent = `${parseInt(data, 10)} level`;
+    const newLvl = parseInt(data, 10);
+    const value = newLvl === levelsData.length ? 'You win' : `${newLvl} level`;
+    this.elements.current.textContent = value;
   }
 
   private onClickChangeLevel(e: Event): void {
