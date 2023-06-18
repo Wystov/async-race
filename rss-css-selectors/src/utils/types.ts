@@ -8,4 +8,5 @@ export interface BaseElementOptions {
 
 export interface StateData {
   level: number;
+  levelList: string[];
 }

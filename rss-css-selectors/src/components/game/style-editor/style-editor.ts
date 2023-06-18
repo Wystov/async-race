@@ -89,6 +89,7 @@ export class StyleEditor {
       console.log('wrong selector');
       return;
     }
+    this.emitter.emit('lvl-done', this.currentLevelIndex);
     this.showEffect('correct-selector');
     console.log('correct selector');
     input.value = '';
@@ -131,11 +132,13 @@ export class StyleEditor {
   }
 
   private showHelp(): void {
+    this.emitter.emit('help-used', this.currentLevelIndex);
     if (this.currentLevelIndex + 1 === levelsData.length) return;
     this.elements.overlay.classList.add('overlay');
     const { selector } = levelsData[this.currentLevelIndex];
     const { input, sumbitBtn } = this.elements;
     if (!(input instanceof HTMLInputElement)) return;
+    input.value = '';
     let i = 0;
     const typeEffect = (): void => {
       if (i < selector.length) {

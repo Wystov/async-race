@@ -21,7 +21,7 @@ export class TaskSelector {
   private init(): void {
     this.createElements();
     this.addListeners();
-    this.fillLevels();
+    this.emitter.emit('ask-levelList-state');
   }
 
   private createElements(): void {
@@ -59,19 +59,47 @@ export class TaskSelector {
       'click',
       this.onClickChangeLevel.bind(this)
     );
-    this.emitter.on('change-level', this.changeLevel.bind(this));
+    this.emitter.on('change-level', (data: string) => {
+      this.changeLevel(data);
+      this.emitter.emit('ask-levelList-state');
+    });
+    this.emitter.on('send-levelList-state', (state: string[]) => {
+      this.fillLevels(state);
+    });
   }
 
-  private fillLevels(): void {
+  private fillLevels(state: string[]): void {
+    if (this.levels.length > 0) {
+      this.changeLevelsState(state);
+      return;
+    }
     levelsData.forEach((data, index) => {
       if (data.title === 'Final message') return;
       const lvlElement = new ElementCreator({
         tagName: 'li',
         textContent: `${index + 1} level`,
-        classes: ['selector__level'],
+        classes: ['selector__level', `selector__level--${state[index]}`],
       }).getNode();
       this.levels.push(lvlElement);
       this.elements.levelList.append(lvlElement);
+    });
+    this.elements.resetBtn = new ElementCreator({
+      tagName: 'button',
+      classes: ['selector__reset-btn'],
+      textContent: 'Reset progress',
+      parent: this.elements.levelList,
+    }).getNode();
+  }
+
+  private changeLevelsState(state: string[]): void {
+    if (this.elements.current.textContent === null) return;
+    const currentLvlIndex = parseInt(this.elements.current.textContent, 10) - 1;
+    this.levels.forEach((el, index) => {
+      el.removeAttribute('class');
+      el.classList.add('selector__level', `selector__level--${state[index]}`);
+      if (index === currentLvlIndex) {
+        el.classList.add('selector__level--active');
+      }
     });
   }
 
@@ -83,6 +111,10 @@ export class TaskSelector {
 
   private onClickChangeLevel(e: Event): void {
     if (e.target instanceof HTMLElement && e.target.textContent !== null) {
+      if (e.target.classList.contains('selector__reset-btn')) {
+        this.emitter.emit('reset-progress');
+        return;
+      }
       const { levelList } = this.elements;
       if (
         levelList.getAttribute('style') ===
