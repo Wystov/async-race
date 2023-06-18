@@ -2,6 +2,7 @@ import { ElementCreator } from '../../../utils/element-creator';
 import type { EventEmitter } from '../../../utils/event-emitter';
 import { levelsData } from '../../../data/levels';
 import './_visualizer.scss';
+import { Tooltip } from './tooltip/tooltip';
 
 export class Visualizer {
   private readonly section;
@@ -51,6 +52,10 @@ export class Visualizer {
       this.elements.viewContainer.innerHTML = markup;
     }
     this.setAnimation(targetLvl, 'select-me');
+    [...this.elements.viewContainer.children].forEach((el) => {
+      el.addEventListener('mouseover', this.showTooltip.bind(this));
+      el.addEventListener('mouseout', this.hideTooltip.bind(this));
+    });
   }
 
   private setAnimation(lvl: number, className: string): void {
@@ -60,5 +65,21 @@ export class Visualizer {
     targetElements.forEach((el) => {
       el.classList.add(className);
     });
+  }
+
+  private showTooltip(e: Event): void {
+    if (!(e.target instanceof Element) || this.elements.tooltip !== undefined) {
+      return;
+    }
+    this.elements.tooltip = new Tooltip(e.target).getElement();
+  }
+
+  private hideTooltip(e: Event): void {
+    if (!(e.target instanceof Element) || this.elements.tooltip === undefined) {
+      return;
+    }
+    e.target.classList.remove('hover');
+    this.elements.tooltip.remove();
+    delete this.elements.tooltip;
   }
 }

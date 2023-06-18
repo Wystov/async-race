@@ -3,7 +3,7 @@ export const levelsData = [
     title: 'Hardest level',
     description: 'Do you know what a tag selector is?',
     task: 'Select all circles',
-    html: `<div class='field'>
+    html: `<div class="field">
   <circle></circle>
   <underscore></underscore>
   <circle></circle>
@@ -14,8 +14,8 @@ export const levelsData = [
     title: 'Title',
     description: 'Class selector is not a tag selector',
     task: 'Select red circle',
-    html: `<div class='field'>
-  <circle class='red'></circle>
+    html: `<div class="field">
+  <circle class="red"></circle>
   <circle></circle>
 </div>`,
     selector: '.red',
@@ -24,9 +24,9 @@ export const levelsData = [
     title: 'Not a title',
     description: 'All you have to do is count up to two.',
     task: 'You see what to select',
-    html: `<div class='field'>
-  <square class='blue'></square>
-  <square class='blue'></square>
+    html: `<div class="field">
+  <square class="blue"></square>
+  <square class="blue"></square>
   <circle></circle>
 </div>`,
     selector: '.blue:nth-child(2)',
@@ -35,7 +35,7 @@ export const levelsData = [
     title: '',
     description: '',
     task: 'The dev made these lovely animations',
-    html: `<div class='field'>
+    html: `<div class="field">
   <triangle></triangle>
   <triangle fake="attribute"></triangle>
   <triangle></triangle>
@@ -128,9 +128,7 @@ export const levelsData = [
     title: '',
     description: 'Who am i to disagree',
     task: "<H1>! I'll be the main thing on the whole page!!",
-    html: `<div class="field">
-  </div>
-  `,
+    html: '<div class="field"> </div>',
     selector: '.field',
   },
   {

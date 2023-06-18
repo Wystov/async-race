@@ -1,12 +1,15 @@
 @import './shape-vars';
 
 .field {
+  cursor: help;
+  position: relative;
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: flex-end;
   max-width: 80%;
   border: 2px solid #dee3e7;
   padding: 20px 40px;
+  transition: 0.3s;
 }
 
 .select-me {
@@ -15,6 +18,10 @@
 
 .element-selected {
   animation: element-selected 1s ease-in-out forwards;
+}
+
+.hover {
+  box-shadow: 0 0 10px 5px rgba(222, 227, 231, 0.5);
 }
 
 .red {
@@ -40,9 +47,11 @@ underscore {
   outline: 2px solid #dee3e7;
   outline-offset: -2px;
   margin: 12px;
+  transition: 0.3s;
 }
 
 underscore {
+  height: 0;
   outline: none;
   border-bottom: 2px solid #dee3e7;
 }
@@ -58,6 +67,7 @@ triangle {
   margin: 12px;
   background-image: $triangle;
   background-size: contain;
+  transition: 0.3s;
 
   &.red {
     background-color: transparent;
@@ -73,6 +83,11 @@ triangle {
     background-color: transparent;
     background-image: $triangle-blue;
   }
+
+  &.hover {
+    box-shadow: none;
+    filter: drop-shadow(0 0 8px #ffffff);
+  }
 }
 
 border {
@@ -80,4 +95,5 @@ border {
   justify-content: center;
   align-items: center;
   border: 2px dashed #dee3e7;
+  transition: 0.3s;
 }
