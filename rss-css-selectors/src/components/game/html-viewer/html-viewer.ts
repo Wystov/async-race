@@ -34,7 +34,7 @@ export class HtmlViewer {
     }).getNode();
     this.elements.code = new ElementCreator({
       tagName: 'pre',
-      classes: ['html-viewer__code'],
+      classes: ['html-viewer__code', 'language-xml'],
       parent: this.elements.body,
     }).getNode();
     this.emitter.on('change-level', (data: string) => {
