@@ -103,18 +103,18 @@ export class StyleEditor {
     if (!(input instanceof HTMLInputElement)) return;
     const correctSelector = levelsData[this.currentLevelIndex].selector;
 
-    const userSelectedElements = document.querySelectorAll(input.value);
-    const correctElements = document.querySelectorAll(correctSelector);
-
-    const isEqual = this.compareElements(userSelectedElements, correctElements);
-    if (!isEqual) {
+    try {
+      const userSelectedElements = document.querySelectorAll(input.value);
+      const correctElements = document.querySelectorAll(correctSelector);
+      const isEqual = this.compareElements(userSelectedElements, correctElements);
+      if (!isEqual) throw new Error('Wrong selector');
+    } catch (error) {
       this.showEffect('wrong-selector');
-      console.log('wrong selector');
       return;
     }
+
     this.emitter.emit('lvl-done', this.currentLevelIndex);
     this.showEffect('correct-selector');
-    console.log('correct selector');
     input.value = '';
     this.elements.highlightedCSS.textContent = '';
     this.emitter.emit('correct-selector', this.currentLevelIndex);

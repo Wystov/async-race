@@ -178,7 +178,6 @@ const PSEUDO_CLASSES = [
   'drop',
   'empty',
   'enabled',
-  'first',
   'first-child',
   'first-of-type',
   'fullscreen',
