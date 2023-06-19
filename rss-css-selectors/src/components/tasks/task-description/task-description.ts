@@ -28,6 +28,34 @@ export class TaskDescription {
       textContent: levelsData[0].description,
       parent: this.section,
     }).getNode();
+    this.elements.footer = new ElementCreator({
+      classes: ['description__footer'],
+      parent: this.section,
+    }).getNode();
+    this.elements.github = new ElementCreator({
+      tagName: 'a',
+      classes: ['footer__github'],
+      parent: this.elements.footer,
+      attributes: {
+        href: 'https://github.com/Wystov',
+        target: '_blank',
+      }
+    }).getNode();
+    this.elements.year = new ElementCreator({
+      tagName: 'span',
+      classes: ['footer__year'],
+      textContent: '2023',
+      parent: this.elements.footer,
+    }).getNode();
+    this.elements.rss = new ElementCreator({
+      tagName: 'a',
+      classes: ['footer__rss'],
+      parent: this.elements.footer,
+      attributes: {
+        href: 'https://rs.school/js/',
+        target: '_blank',
+      }
+    }).getNode();
     this.emitter.on('change-level', (data: string) => {
       this.changeLevel(data);
     });
