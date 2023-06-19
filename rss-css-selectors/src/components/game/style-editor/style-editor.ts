@@ -1,7 +1,13 @@
+import hljs from 'highlight.js/lib/core';
+import css from '../../../utils/hljs-rules/css';
+import 'highlight.js/scss/atom-one-dark.scss';
 import { ElementCreator } from '../../../utils/element-creator';
 import type { EventEmitter } from '../../../utils/event-emitter';
 import { levelsData } from '../../../data/levels';
 import './_style-editor.scss';
+import { showCssData } from '../../../data/showCssData';
+
+hljs.registerLanguage('css', css);
 
 export class StyleEditor {
   private readonly section;
@@ -23,6 +29,7 @@ export class StyleEditor {
     this.addListeners();
   }
 
+  // eslint-disable-next-line max-lines-per-function
   private createElements(): void {
     this.elements.title = new ElementCreator({
       classes: ['style-editor__title'],
@@ -37,9 +44,23 @@ export class StyleEditor {
       tagName: 'input',
       classes: ['style-editor__input'],
       parent: this.elements.body,
+      attributes: {
+        type: 'text',
+        placeholder: 'Type in CSS selector',
+        spellcheck: 'false',
+      },
     }).getNode();
-    this.elements.input.setAttribute('type', 'text');
-    this.elements.input.setAttribute('placeholder', 'Type in CSS selector');
+    this.elements.highlightedCSS = new ElementCreator({
+      tagName: 'pre',
+      classes: ['style-editor__highlighted-css', 'language-css'],
+      parent: this.elements.body,
+    }).getNode();
+    this.elements.cssStyles = new ElementCreator({
+      tagName: 'pre',
+      classes: ['style-editor__css-styles', 'language-css'],
+      parent: this.elements.body,
+      textContent: showCssData,
+    }).getNode();
     this.elements.sumbitBtn = new ElementCreator({
       tagName: 'button',
       classes: ['style-editor__submit-btn'],
@@ -55,6 +76,7 @@ export class StyleEditor {
     this.elements.overlay = new ElementCreator({
       parent: document.body,
     }).getNode();
+    hljs.highlightElement(this.elements.cssStyles);
   }
 
   private addListeners(): void {
@@ -69,6 +91,7 @@ export class StyleEditor {
       }
     });
     this.emitter.on('change-level', this.getCurrentLevelIndex.bind(this));
+    this.elements.input.addEventListener('input', this.highlightCSS.bind(this));
   }
 
   private getCurrentLevelIndex(data: string): void {
@@ -93,6 +116,7 @@ export class StyleEditor {
     this.showEffect('correct-selector');
     console.log('correct selector');
     input.value = '';
+    this.elements.highlightedCSS.textContent = '';
     this.emitter.emit('correct-selector', this.currentLevelIndex);
     if (this.currentLevelIndex < levelsData.length - 1) {
       setTimeout(() => {
@@ -143,6 +167,7 @@ export class StyleEditor {
     const typeEffect = (): void => {
       if (i < selector.length) {
         input.value += selector[i];
+        this.highlightCSS();
         i++;
         setTimeout(typeEffect, 75);
         return;
@@ -152,5 +177,12 @@ export class StyleEditor {
       }, 1500);
     };
     typeEffect();
+  }
+
+  private highlightCSS(): void {
+    const { input, highlightedCSS } = this.elements;
+    if (!(input instanceof HTMLInputElement)) return;
+    highlightedCSS.textContent = input.value;
+    hljs.highlightElement(highlightedCSS);
   }
 }

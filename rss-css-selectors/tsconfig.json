@@ -8,9 +8,12 @@
     "noImplicitAny": true,
     "skipLibCheck": true,
     "moduleResolution": "node",
+    "allowJs": true,
+    "outDir": "dist"
   },
   "include": [
     "src/**/*.ts",
+    "src/**/*.d.ts",
     ".eslintrc.js",
     "webpack.config.js"
   ]

@@ -46,8 +46,10 @@ export class TaskSelector {
       tagName: 'ul',
       classes: ['selector__levels'],
       parent: this.section,
+      attributes: {
+        'style': 'max-height: 0px',
+      }
     }).getNode();
-    this.elements.levelList.setAttribute('style', 'max-height: 0px');
   }
 
   private addListeners(): void {

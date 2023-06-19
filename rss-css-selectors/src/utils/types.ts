@@ -4,6 +4,7 @@ export interface BaseElementOptions {
   textContent?: string;
   innerHTML?: string;
   parent?: HTMLElement | null;
+  attributes?: Record<string, string> | null;
 }
 
 export interface StateData {

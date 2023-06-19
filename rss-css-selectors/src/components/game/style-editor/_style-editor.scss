@@ -1,6 +1,7 @@
 @import './animation';
 
 .style-editor {
+  position: relative;
 
   &__title {
     margin-top: 7px;
@@ -17,23 +18,53 @@
   &__body {
     position: relative;
     padding: 20px;
-    height: calc(100% - 83px);
+    padding-bottom: 0;
+    height: calc(100% - 63px);
     background-color: #131924;
     border-top: 1px solid #414141;
     border-left: 1px solid #414141;
   }
 
-  &__input {
+  &__input,
+  &__highlighted-css {
+    width: 90%;
+    height: 29px;
     font-family: monospace;
     font-size: 16px;
     min-width: 200px;
-    width: 90%;
+    height: 19px;
     padding: 5px 10px;
-    color: #dee3e7;
+    margin: 0;
     outline: none;
     border: none;
     background-color: #131924;
     animation: strobe 0.5s infinite;
+  }
+
+  &__input {
+    color: transparent;
+    caret-color: #dee3e7;
+
+    &::placeholder {
+      color: #989898;
+    }
+  }
+
+  &__highlighted-css {
+    position: relative;
+    top: -31px;
+    z-index: 2;
+    color: #dee3e7;
+    pointer-events: none;
+    background-color: transparent;
+    animation: none;
+  }
+
+  &__css-styles {
+    position: relative;
+    top: -20px;
+    margin: 0;
+    background-color: #131924;
   }
 
   &__submit-btn,
