@@ -1,80 +1,41 @@
-import './_task-selector.scss';
-import { ElementCreator } from '../../../utils/element-creator';
-import { levelsData } from '../../../data/levels';
 import type { EventEmitter } from '../../../utils/event-emitter';
+import { ElementCreator } from '../../../utils/element-creator';
+import { SectionCreator } from '../../../utils/section-creator';
+import { selectorElements } from '../../../data/elements/task-selector';
+import { levelsData } from '../../../data/levels';
+import './_task-selector.scss';
 
-export class TaskSelector {
-  private readonly section: HTMLElement;
-  private readonly elements: Record<string, HTMLElement> = {};
-  private readonly emitter: EventEmitter;
+export class TaskSelector extends SectionCreator {
   private readonly levels: HTMLElement[] = [];
 
-  constructor(parent: HTMLElement, emitter: EventEmitter) {
-    this.emitter = emitter;
-    this.section = new ElementCreator({
-      classes: ['selector', 'task__selector'],
-    }).getNode();
-    this.init();
-    parent.append(this.section);
-  }
-
-  private init(): void {
-    this.createElements();
+  constructor(parent: HTMLElement, private readonly emitter: EventEmitter) {
+    super(selectorElements, parent);
     this.addListeners();
     this.emitter.emit('ask-levelList-state');
   }
 
-  private createElements(): void {
-    this.elements.title = new ElementCreator({
-      classes: ['selector__title'],
-      textContent: 'CSS mind-breaker',
-      parent: this.section,
-    }).getNode();
-    this.elements.header = new ElementCreator({
-      classes: ['selector__header'],
-      parent: this.section,
-    }).getNode();
-    this.elements.arrow = new ElementCreator({
-      classes: ['selector__arrow'],
-      parent: this.elements.header,
-    }).getNode();
-    this.elements.current = new ElementCreator({
-      classes: ['selector__current'],
-      parent: this.elements.header,
-    }).getNode();
-    this.elements.levelList = new ElementCreator({
-      tagName: 'ul',
-      classes: ['selector__levels'],
-      parent: this.section,
-      attributes: {
-        'style': 'max-height: 0px',
-      }
-    }).getNode();
-  }
-
   private addListeners(): void {
-    this.elements.header.addEventListener(
-      'click',
-      this.toggleLevelList.bind(this)
-    );
-    this.elements.levelList.addEventListener(
-      'click',
-      this.onClickChangeLevel.bind(this)
-    );
-    this.emitter.on('change-level', (data: string) => {
-      this.changeLevel(data);
+    const { header, levelList } = this.elements;
+    header.addEventListener('click', this.toggleLevelList.bind(this));
+    levelList.addEventListener('click', this.handleListClick.bind(this));
+    this.emitter.on('change-level', (lvl: number) => {
+      this.changeCurrentLevelText(lvl);
       this.emitter.emit('ask-levelList-state');
     });
     this.emitter.on('send-levelList-state', (state: string[]) => {
-      this.fillLevels(state);
+      this.handleLevelList(state);
     });
   }
 
-  private fillLevels(state: string[]): void {
-    if (this.levels.length > 0) {
-      this.changeLevelsState(state);
+  private handleLevelList(state: string[]): void {
+    if (this.levels.length === 0) {
+      this.createLevelList(state);
       return;
     }
+    this.changeLevelList(state);
+  }
+
+  private createLevelList(state: string[]): void {
     levelsData.forEach((data, index) => {
       if (data.title === 'Final message') return;
       const lvlElement = new ElementCreator({
@@ -93,7 +54,7 @@ export class TaskSelector {
     }).getNode();
   }
 
-  private changeLevelsState(state: string[]): void {
+  private changeLevelList(state: string[]): void {
     if (this.elements.current.textContent === null) return;
     const currentLvlIndex = parseInt(this.elements.current.textContent, 10) - 1;
     this.levels.forEach((el, index) => {
@@ -105,13 +66,12 @@ export class TaskSelector {
     });
   }
 
-  private changeLevel(data: string): void {
-    const newLvl = parseInt(data, 10);
-    const value = newLvl === levelsData.length ? 'You win' : `${newLvl} level`;
+  private changeCurrentLevelText(lvl: number): void {
+    const value = lvl === levelsData.length ? 'You win' : `${lvl} level`;
     this.elements.current.textContent = value;
   }
 
-  private onClickChangeLevel(e: Event): void {
+  private handleListClick(e: Event): void {
     if (e.target instanceof HTMLElement && e.target.textContent !== null) {
       if (e.target.classList.contains('selector__reset-btn')) {
         this.emitter.emit('reset-progress');
@@ -124,7 +84,7 @@ export class TaskSelector {
       ) {
         this.toggleLevelList();
       }
-      this.emitter.emit('change-level', e.target.textContent);
+      this.emitter.emit('change-level', parseInt(e.target.textContent, 10));
     }
   }
 

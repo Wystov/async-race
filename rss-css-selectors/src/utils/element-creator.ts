@@ -6,21 +6,27 @@ export class ElementCreator {
   constructor({
     tagName = 'div',
     classes = [],
-    innerHTML = '',
     textContent = '',
     parent = null,
     attributes = null,
   }: Partial<BaseElementOptions>) {
     this.#node = document.createElement(tagName);
     this.#node.classList.add(...classes);
-    if (innerHTML.length > 0) this.#node.innerHTML = innerHTML;
     if (textContent.length > 0) this.#node.textContent = textContent;
-    if (parent instanceof HTMLElement) parent.append(this.#node);
-    if (attributes !== null) {
+    this.setAttributes(attributes);
+    this.appendTo(parent);
+  }
+
+  private setAttributes(attributes: Record<string, string> | null): void {
+    if (attributes !== null && this.#node !== undefined) {
       Object.entries(attributes).forEach(([key, value]) => {
         this.#node.setAttribute(key, value);
       });
     }
+  }
+
+  public appendTo(parent: HTMLElement | string | null): void {
+    if (parent instanceof HTMLElement) parent.append(this.#node);
   }
 
   public getNode(): HTMLElement {

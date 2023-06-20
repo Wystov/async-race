@@ -17,7 +17,6 @@ export class Tooltip {
   }
 
   private init(target: Element): void {
-    target.classList.add('hover');
     const { tagName, attributes } = target;
     const attributesText = this.parseAttributes(attributes);
     const tooltipText =
@@ -32,17 +31,17 @@ export class Tooltip {
     hljs.highlightElement(this.elements.tooltip);
     this.positionTooltip(target);
   }
+
   private parseAttributes(attributes: NamedNodeMap): string {
     const attributesArray = [...attributes];
-    let attributesText = '';
-    attributesArray.forEach((attr) => {
-      const value = attr.value
+    return attributesArray.reduce((acc, { name, value }) => {
+      const newValue = value
         .replace('select-me', '')
         .replace('hover', '')
         .trimEnd();
-      if (value.length > 0) attributesText += ` ${attr.name}="${value}"`;
-    });
-    return attributesText;
+      console.log(value, newValue);
+      return newValue.length > 0 ? `${acc} ${name}="${newValue}"` : acc;
+    }, '');
   }
 
   private positionTooltip(target: Element): void {

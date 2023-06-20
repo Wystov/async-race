@@ -1,101 +1,36 @@
 import hljs from 'highlight.js/lib/core';
 import css from '../../../utils/hljs-rules/css';
 import 'highlight.js/scss/atom-one-dark.scss';
-import { ElementCreator } from '../../../utils/element-creator';
 import type { EventEmitter } from '../../../utils/event-emitter';
+import { SectionCreator } from '../../../utils/section-creator';
+import { editorElements } from '../../../data/elements/style-editor';
 import { levelsData } from '../../../data/levels';
 import './_style-editor.scss';
-import { showCssData } from '../../../data/showCssData';
 
 hljs.registerLanguage('css', css);
 
-export class StyleEditor {
-  private readonly section;
-  private readonly elements: Record<string, HTMLElement> = {};
-  private readonly emitter: EventEmitter;
+export class StyleEditor extends SectionCreator {
   private currentLevelIndex = 0;
 
-  constructor(parent: HTMLElement, emitter: EventEmitter) {
-    this.emitter = emitter;
-    this.section = new ElementCreator({
-      classes: ['style-editor', 'game__style-editor'],
-    }).getNode();
-    this.init();
-    parent.append(this.section);
-  }
-
-  private init(): void {
-    this.createElements();
+  constructor(parent: HTMLElement, private readonly emitter: EventEmitter) {
+    super(editorElements, parent);
     this.addListeners();
-  }
-
-  // eslint-disable-next-line max-lines-per-function
-  private createElements(): void {
-    this.elements.title = new ElementCreator({
-      classes: ['style-editor__title'],
-      textContent: 'style.css',
-      parent: this.section,
-    }).getNode();
-    this.elements.body = new ElementCreator({
-      classes: ['style-editor__body'],
-      parent: this.section,
-    }).getNode();
-    this.elements.input = new ElementCreator({
-      tagName: 'input',
-      classes: ['style-editor__input'],
-      parent: this.elements.body,
-      attributes: {
-        type: 'text',
-        placeholder: 'Type in CSS selector',
-        spellcheck: 'false',
-      },
-    }).getNode();
-    this.elements.highlightedCSS = new ElementCreator({
-      tagName: 'pre',
-      classes: ['style-editor__highlighted-css', 'language-css'],
-      parent: this.elements.body,
-    }).getNode();
-    this.elements.cssStyles = new ElementCreator({
-      tagName: 'pre',
-      classes: ['style-editor__css-styles', 'language-css'],
-      parent: this.elements.body,
-      textContent: showCssData,
-    }).getNode();
-    this.elements.sumbitBtn = new ElementCreator({
-      tagName: 'button',
-      classes: ['style-editor__submit-btn'],
-      textContent: 'Submit',
-      parent: this.elements.body,
-    }).getNode();
-    this.elements.helpBtn = new ElementCreator({
-      tagName: 'button',
-      classes: ['style-editor__help-btn'],
-      textContent: 'Help',
-      parent: this.elements.body,
-    }).getNode();
-    this.elements.overlay = new ElementCreator({
-      parent: document.body,
-    }).getNode();
     hljs.highlightElement(this.elements.cssStyles);
   }
 
   private addListeners(): void {
-    this.elements.sumbitBtn.addEventListener(
-      'click',
-      this.checkInput.bind(this)
-    );
-    this.elements.helpBtn.addEventListener('click', this.showHelp.bind(this));
-    this.elements.input.addEventListener('keyup', (e) => {
-      if (e.key === 'Enter') {
-        this.elements.sumbitBtn.click();
-      }
+    const { sumbitBtn, helpBtn, input } = this.elements;
+    sumbitBtn.addEventListener('click', this.checkInput.bind(this));
+    helpBtn.addEventListener('click', this.showHelp.bind(this));
+    input.addEventListener('keyup', (e) => {
+      if (e.key === 'Enter') sumbitBtn.click();
     });
-    this.emitter.on('change-level', this.getCurrentLevelIndex.bind(this));
-    this.elements.input.addEventListener('input', this.highlightCSS.bind(this));
+    this.emitter.on('change-level', this.setCurrentLevelIndex.bind(this));
+    input.addEventListener('input', this.highlightCSS.bind(this));
   }
 
-  private getCurrentLevelIndex(data: string): void {
-    this.currentLevelIndex = parseInt(data, 10) - 1;
+  private setCurrentLevelIndex(lvl: string): void {
+    this.currentLevelIndex = parseInt(lvl, 10) - 1;
   }
 
   private checkInput(): void {
@@ -106,22 +41,30 @@ export class StyleEditor {
     try {
       const userSelectedElements = document.querySelectorAll(input.value);
       const correctElements = document.querySelectorAll(correctSelector);
-      const isEqual = this.compareElements(userSelectedElements, correctElements);
+      const isEqual = this.compareElements(
+        userSelectedElements,
+        correctElements
+      );
       if (!isEqual) throw new Error('Wrong selector');
     } catch (error) {
       this.showEffect('wrong-selector');
       return;
     }
+    this.lvlDone();
+  }
 
+  private lvlDone(): void {
+    const { input, highlightedCSS, overlay } = this.elements;
+    if (!(input instanceof HTMLInputElement)) return;
     this.emitter.emit('lvl-done', this.currentLevelIndex);
     this.showEffect('correct-selector');
     input.value = '';
-    this.elements.highlightedCSS.textContent = '';
+    highlightedCSS.textContent = '';
     this.emitter.emit('correct-selector', this.currentLevelIndex);
     if (this.currentLevelIndex < levelsData.length - 1) {
       setTimeout(() => {
         this.emitter.emit('change-level', this.currentLevelIndex + 2);
-        this.elements.overlay.classList.remove('overlay');
+        overlay.classList.remove('overlay');
       }, 1000);
     }
   }
@@ -135,48 +78,49 @@ export class StyleEditor {
         return false;
       }
     }
-    if (userSelectedElements.length === correctElements.length) {
-      return true;
-    }
-    return false;
+    return userSelectedElements.length === correctElements.length;
   }
 
   private showEffect(effect: string): void {
+    const { sumbitBtn } = this.elements;
     const value = effect === 'wrong-selector' ? '🗙' : '✓';
-    this.elements.sumbitBtn.classList.toggle(
-      `style-editor__submit-btn--${effect}`
-    );
-    this.elements.sumbitBtn.textContent = value;
+    sumbitBtn.classList.toggle(`style-editor__submit-btn--${effect}`);
+    sumbitBtn.textContent = value;
     setTimeout(() => {
-      this.elements.sumbitBtn.classList.toggle(
-        `style-editor__submit-btn--${effect}`
-      );
-      this.elements.sumbitBtn.textContent = 'Submit';
+      sumbitBtn.classList.toggle(`style-editor__submit-btn--${effect}`);
+      sumbitBtn.textContent = 'Submit';
     }, 800);
   }
 
   private showHelp(): void {
     this.emitter.emit('help-used', this.currentLevelIndex);
     if (this.currentLevelIndex + 1 === levelsData.length) return;
-    this.elements.overlay.classList.add('overlay');
+    const { overlay, input } = this.elements;
     const { selector } = levelsData[this.currentLevelIndex];
-    const { input, sumbitBtn } = this.elements;
+    overlay.classList.add('overlay');
     if (!(input instanceof HTMLInputElement)) return;
     input.value = '';
+
+    this.typeEffect(selector);
+  }
+
+  private typeEffect(selector: string): void {
+    const { input, sumbitBtn } = this.elements;
+    if (!(input instanceof HTMLInputElement)) return;
     let i = 0;
-    const typeEffect = (): void => {
-      if (i < selector.length) {
-        input.value += selector[i];
-        this.highlightCSS();
-        i++;
-        setTimeout(typeEffect, 75);
+    const type = (): void => {
+      if (i === selector.length) {
+        setTimeout(() => {
+          sumbitBtn.click();
+        }, 1500);
         return;
       }
-      setTimeout(() => {
-        sumbitBtn.click();
-      }, 1500);
+      input.value += selector[i];
+      this.highlightCSS();
+      i++;
+      setTimeout(type, 75);
     };
-    typeEffect();
+    type();
   }
 
   private highlightCSS(): void {
