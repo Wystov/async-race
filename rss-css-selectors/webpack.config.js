@@ -12,6 +12,8 @@ const config = {
   entry: './src/index.ts',
   output: {
     path: path.resolve(__dirname, 'dist'),
+    filename: '[name].[contenthash].js',
+    clean: true,
   },
   devServer: {
     open: true,
@@ -33,7 +35,9 @@ const config = {
       template: 'index.html',
     }),
 
-    new MiniCssExtractPlugin(),
+    new MiniCssExtractPlugin({
+      filename: '[name].[contenthash].css',
+    }),
   ],
   module: {
     rules: [
