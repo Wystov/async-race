@@ -25,11 +25,9 @@ export class Visualizer extends SectionCreator {
     const targetLvlIndex = lvl - 1;
     task.textContent = levelsData[targetLvlIndex].task;
     const markup = levelsData[targetLvlIndex].html;
-    if (typeof markup === 'string') {
-      viewContainer.innerHTML = markup;
-    }
+    viewContainer.innerHTML = markup;
     this.setAnimation(targetLvlIndex, 'select-me');
-    [...this.elements.viewContainer.children].forEach((el) => {
+    Array.from(this.elements.viewContainer.children).forEach((el) => {
       el.addEventListener('mouseover', this.showTooltip.bind(this));
       el.addEventListener('mouseout', this.hideTooltip.bind(this));
     });

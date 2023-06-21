@@ -11,4 +11,4 @@ export const showCssData = `{
   100% {
     opacity: 0;
   }
-}`
+}`;

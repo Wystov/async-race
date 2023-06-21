@@ -19,13 +19,16 @@ export class Tooltip {
   private init(target: Element): void {
     const { tagName, attributes } = target;
     const attributesText = this.parseAttributes(attributes);
-    const tooltipText =
-      `<${tagName}${attributesText}> </${tagName}>`.toLowerCase();
+    const isClosingTag = tagName === 'DIV' || tagName === 'BORDER';
+    let tooltipText = `<${tagName}${attributesText} />`;
+    if (isClosingTag) {
+      tooltipText = `<${tagName}${attributesText}> </${tagName}>`;
+    }
 
     this.elements.tooltip = new ElementCreator({
       classes: ['visualizer__tool-tip'],
       parent: document.body,
-      textContent: tooltipText,
+      textContent: tooltipText.toLowerCase(),
     }).getNode();
 
     hljs.highlightElement(this.elements.tooltip);
@@ -33,13 +36,11 @@ export class Tooltip {
   }
 
   private parseAttributes(attributes: NamedNodeMap): string {
-    const attributesArray = [...attributes];
-    return attributesArray.reduce((acc, { name, value }) => {
+    return Array.from(attributes).reduce((acc, { name, value }) => {
       const newValue = value
         .replace('select-me', '')
         .replace('hover', '')
         .trimEnd();
-      console.log(value, newValue);
       return newValue.length > 0 ? `${acc} ${name}="${newValue}"` : acc;
     }, '');
   }
