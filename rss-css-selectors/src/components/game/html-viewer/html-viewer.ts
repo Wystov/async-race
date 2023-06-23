@@ -15,6 +15,10 @@ export class HtmlViewer extends SectionCreator {
     this.emitter.on('change-level', (lvl: number) => {
       this.changeLevel(lvl);
     });
+    this.emitter.on('element-hovered', (position: number) => {
+      this.addHover(position);
+    });
+    this.emitter.on('element-unhovered', this.removeHover.bind(this));
   }
 
   private changeLevel(lvl: number): void {
@@ -23,8 +27,17 @@ export class HtmlViewer extends SectionCreator {
     this.elements.code.textContent = markup;
     hljs.highlightElement(this.elements.code);
     Array.from(this.elements.code.children).forEach((el) => {
-      el.addEventListener('mouseover', this.addHover.bind(this));
-      el.addEventListener('mouseout', this.removeHover.bind(this));
+      el.addEventListener('mouseover', (e) => {
+        const target = this.getTargetElement(e.target);
+        if (target === null) return;
+        const position = this.findElementPosition(target);
+        this.emitter.emit('code-hovered', position);
+        this.addHover(e);
+      });
+      el.addEventListener('mouseout', () => {
+        this.emitter.emit('code-unhovered');
+        this.removeHover();
+      });
     });
   }
 
@@ -36,8 +49,11 @@ export class HtmlViewer extends SectionCreator {
       .replaceAll('></underscore>', ' />');
   }
 
-  private addHover(e: Event): void {
-    const target = this.getTargetElement(e.target);
+  private addHover(element: Event | number): void {
+    const target =
+      element instanceof Event
+        ? this.getTargetElement(element.target)
+        : this.findTargetElement(element);
     if (target === null) return;
     target.classList.add('code-hover');
     this.elements.hovered = target;
@@ -83,5 +99,28 @@ export class HtmlViewer extends SectionCreator {
     this.elements.hoveredPair?.classList.remove('code-hover');
     delete this.elements.hovered;
     delete this.elements?.hoveredPair;
+  }
+
+  private findTargetElement(position: number): HTMLElement | null {
+    const element = this.elements.code.children[position - 1];
+    if (!(element instanceof HTMLElement)) return null;
+    return element;
+  }
+
+  private findElementPosition(target: HTMLElement): number {
+    let el: Element | null = target;
+    let i = 0;
+    if (el?.textContent?.startsWith('</') ?? false) {
+      const tagName = el.textContent?.slice(2, -1) ?? '';
+      el = el.previousElementSibling;
+      while (el !== null && el.textContent?.includes(tagName) === false) {
+        el = el.previousElementSibling;
+      }
+    }
+    while (el !== null && el !== this.elements.code) {
+      el = el.previousElementSibling;
+      if (!(el?.textContent?.startsWith('</') ?? false)) i++;
+    }
+    return i;
   }
 }
