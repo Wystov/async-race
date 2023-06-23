@@ -61,7 +61,10 @@ export class Visualizer extends SectionCreator {
     }
     target.classList.add('hover');
     this.elements.hovered = target as HTMLElement;
-    this.elements.tooltip = new Tooltip(target).getElement();
+    this.elements.tooltip = new Tooltip(
+      target,
+      this.elements.viewContainer
+    ).getElement();
   }
 
   private hideTooltip(): void {

@@ -6,4 +6,12 @@
   &__visualizer {
     grid-column: span 2;
   }
+
+  @media (max-width: 1000px) {
+    grid-template-columns: 1fr;
+
+    &__visualizer {
+      grid-column: 1;
+    }
+  }
 }

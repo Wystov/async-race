@@ -21,6 +21,7 @@ export class App {
     this.createTask(root);
     this.createGame(root);
     document.body.append(root);
+    this.emitter.on('change-level', this.scrollToTop);
   }
 
   private createTask(root: HTMLElement): void {
@@ -42,5 +43,9 @@ export class App {
     this.game.styleEditor = new StyleEditor(gameElement, this.emitter);
     this.game.htmlViewer = new HtmlViewer(gameElement, this.emitter);
     root.append(gameElement);
+  }
+
+  private scrollToTop(): void {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 }

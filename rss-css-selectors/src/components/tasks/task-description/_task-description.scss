@@ -10,7 +10,15 @@
   &__footer {
     display: flex;
     justify-content: space-between;
+    gap: 5px;
     align-items: flex-end;
+
+    @media (max-width: 1000px) {
+      position: fixed;
+      top: calc(100% - 40px);
+      right: 10px;
+      z-index: 5;
+    }
   }
 }
 

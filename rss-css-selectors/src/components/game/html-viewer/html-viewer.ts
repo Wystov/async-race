@@ -58,18 +58,21 @@ export class HtmlViewer extends SectionCreator {
     target.classList.add('code-hover');
     this.elements.hovered = target;
     const targetTag = target.textContent ?? '';
-    if (targetTag.includes('div') || targetTag.includes('border')) {
-      const isClosingTag = targetTag.startsWith('</');
-      const searchDirection = isClosingTag
-        ? 'previousElementSibling'
-        : 'nextElementSibling';
-      const pairTag = this.findPairTag(target, searchDirection);
+    const pairTags = ['div', 'border', 'h1'];
+    pairTags.forEach((tag) => {
+      if (targetTag.includes(tag)) {
+        const isClosingTag = targetTag.startsWith('</');
+        const searchDirection = isClosingTag
+          ? 'previousElementSibling'
+          : 'nextElementSibling';
+        const pairTag = this.findPairTag(target, searchDirection);
 
-      if (pairTag !== null) {
-        pairTag.classList.add('code-hover');
-        this.elements.hoveredPair = pairTag;
+        if (pairTag !== null) {
+          pairTag.classList.add('code-hover');
+          this.elements.hoveredPair = pairTag;
+        }
       }
-    }
+    });
   }
 
   private getTargetElement(target: EventTarget | null): HTMLElement | null {

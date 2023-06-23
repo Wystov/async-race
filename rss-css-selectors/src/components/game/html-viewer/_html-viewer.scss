@@ -25,6 +25,12 @@
     padding: 20px;
     background-color: #131924;
   }
+
+  @media (max-width: 650px) {
+    &__code {
+      font-size: 13px;
+    }
+  }
 }
 
 .code-hover {

@@ -27,8 +27,7 @@
 
   &__input,
   &__highlighted-css {
-    width: 90%;
-    height: 29px;
+    width: calc(100% - 20px);
     font-family: monospace;
     font-size: 16px;
     min-width: 200px;
@@ -71,7 +70,7 @@
   &__help-btn {
     position: absolute;
     z-index: 5;
-    top: 21px;
+    top: 61px;
     right: 20px;
     cursor: pointer;
     width: 70px;
@@ -81,6 +80,10 @@
     background-color: #dee3e7;
     border: none;
     transition: 0.3s;
+
+    &:hover {
+      border-radius: 5px;
+    }
 
     &--wrong-selector {
       background-color: #cf3b47;
@@ -95,5 +98,14 @@
 
   &__help-btn {
     top: 101px;
+  }
+
+  @media (max-width: 650px) {
+
+    &__input,
+    &__highlighted-css,
+    &__css-styles {
+      font-size: 13px;
+    }
   }
 }
