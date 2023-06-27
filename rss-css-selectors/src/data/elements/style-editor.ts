@@ -1,5 +1,4 @@
 import type { BaseElement } from '../../utils/types';
-import { showCssData } from '../showCssData';
 
 export const editorElements: BaseElement[] = [
   {
@@ -50,7 +49,6 @@ export const editorElements: BaseElement[] = [
       tagName: 'pre',
       classes: ['style-editor__css-styles', 'language-css'],
       parent: 'body',
-      textContent: showCssData,
     },
   },
   {

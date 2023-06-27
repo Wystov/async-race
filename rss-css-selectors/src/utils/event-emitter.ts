@@ -2,12 +2,12 @@
 export class EventEmitter {
   public events: Record<string, Function[]> = {};
 
-  public on(event: string, callback: Function): void {
+  public on<T extends Function>(event: string, callback: T): void {
     if (this.events[event] === undefined) this.events[event] = [];
     this.events[event].push(callback);
   }
 
-  public emit(event: string, ...args: unknown[]): void {
+  public emit<T>(event: string, ...args: T[]): void {
     if (this.events[event] === undefined) {
       console.error("Can't find event to emit");
       return;

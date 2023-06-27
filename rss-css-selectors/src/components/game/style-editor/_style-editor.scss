@@ -17,9 +17,7 @@
 
   &__body {
     position: relative;
-    padding: 20px;
-    padding-bottom: 0;
-    height: calc(100% - 63px);
+    height: calc(100% - 43px);
     background-color: #131924;
     border-top: 1px solid #414141;
     border-left: 1px solid #414141;
@@ -27,12 +25,16 @@
 
   &__input,
   &__highlighted-css {
-    width: calc(100% - 20px);
+    position: relative;
+    top: 16px;
+    left: 40px;
+    z-index: 2;
+    width: calc(100% - 80px);
     font-family: monospace;
     font-size: 16px;
     min-width: 200px;
     height: 19px;
-    padding: 5px 10px;
+    padding: 5px 11px;
     margin: 0;
     outline: none;
     border: none;
@@ -51,7 +53,7 @@
 
   &__highlighted-css {
     position: relative;
-    top: -31px;
+    top: -15px;
     z-index: 2;
     color: #dee3e7;
     pointer-events: none;
@@ -61,9 +63,27 @@
 
   &__css-styles {
     position: relative;
-    top: -20px;
+    top: -41px;
     margin: 0;
     background-color: #131924;
+
+    & .hljs {
+      counter-increment: line;
+      padding-left: 50px;
+      background-color: #131924;
+
+      &::before {
+        content: counter(line);
+        position: absolute;
+        right: calc(100% - 40px);
+        padding-right: 10px;
+        border-right: 1px solid #414141;
+      }
+    }
+
+    &:first-child {
+      right: 0;
+    }
   }
 
   &__submit-btn,

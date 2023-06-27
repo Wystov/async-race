@@ -2,9 +2,11 @@ import hljs from 'highlight.js/lib/core';
 import css from '../../../utils/hljs-rules/css';
 import 'highlight.js/scss/atom-one-dark.scss';
 import type { EventEmitter } from '../../../utils/event-emitter';
+import { ElementCreator } from '../../../utils/element-creator';
 import { SectionCreator } from '../../../utils/section-creator';
 import { editorElements } from '../../../data/elements/style-editor';
 import { levelsData } from '../../../data/levels';
+import { showCssData } from '../../../data/showCssData';
 import './_style-editor.scss';
 
 hljs.registerLanguage('css', css);
@@ -15,7 +17,7 @@ export class StyleEditor extends SectionCreator {
   constructor(parent: HTMLElement, private readonly emitter: EventEmitter) {
     super(editorElements, parent);
     this.addListeners();
-    hljs.highlightElement(this.elements.cssStyles);
+    this.createStyleLines();
   }
 
   private addListeners(): void {
@@ -27,6 +29,14 @@ export class StyleEditor extends SectionCreator {
     });
     this.emitter.on('change-level', this.setCurrentLevelIndex.bind(this));
     input.addEventListener('input', this.highlightCSS.bind(this));
+  }
+
+  private createStyleLines(): void {
+    showCssData.forEach((line: string) => {
+      const newLine = new ElementCreator({ textContent: line }).getNode();
+      hljs.highlightElement(newLine);
+      this.elements.cssStyles.append(newLine);
+    });
   }
 
   private setCurrentLevelIndex(lvl: string): void {
@@ -81,7 +91,7 @@ export class StyleEditor extends SectionCreator {
     return userSelectedElements.length === correctElements.length;
   }
 
-  private showEffect(effect: string): void {
+  private showEffect(effect: 'correct-selector' | 'wrong-selector'): void {
     const { sumbitBtn } = this.elements;
     const value = effect === 'wrong-selector' ? '🗙' : '✓';
     sumbitBtn.classList.toggle(`style-editor__submit-btn--${effect}`);
