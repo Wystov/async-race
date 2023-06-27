@@ -31,7 +31,7 @@ export class State {
     );
   }
 
-  private changeLevelState(data: number, state: string): void {
+  private changeLevelState(data: number, state: 'help-used' | 'lvl-done'): void {
     const { levelStateList } = this.settings;
     if (levelStateList?.[data] === 'new') {
       levelStateList[data] = state;

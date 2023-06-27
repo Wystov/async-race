@@ -12,6 +12,10 @@ hljs.registerLanguage('xml', xml);
 export class HtmlViewer extends SectionCreator {
   constructor(parent: HTMLElement, private readonly emitter: EventEmitter) {
     super(viewerElements, parent);
+    this.addListeners();
+  }
+
+  private addListeners(): void {
     this.emitter.on('change-level', (lvl: number) => {
       this.changeLevel(lvl);
     });
