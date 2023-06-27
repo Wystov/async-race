@@ -128,14 +128,28 @@ export const levelsData = [
     title: '',
     description: 'Who am i to disagree',
     task: "<H1>! I'll be the main thing on the whole page!!",
-    html: '<div class="field"> </div>',
-    selector: '.field',
+    html: `<div class="field">
+  <circle></circle>
+  <circle class="red"></circle>
+  <circle class="green"></circle>
+  <circle class="blue"></circle>
+  <border>
+    <square></square>
+    <square class="red"></square>
+    <square class="green"></square>
+    <square class="blue"></square>
+  </border>
+</div>`,
+    selector: 'circle:nth-of-type(even), square:nth-of-type(odd)',
   },
   {
     title: '',
     description: 'The golden words',
     task: '',
-    html: '<h1>And you should keep dreeming !</h1>',
+    html: `<div id="whole-page">
+  <h1>And you should keep dreeming !
+  </h1>
+</div>`,
     selector: 'h1',
   },
   {
@@ -143,6 +157,6 @@ export const levelsData = [
     description: '',
     task: "That's all for now. Thanks for playing! See ya.",
     html: '¯\\_(ツ)_/¯',
-    selector: 'h1',
+    selector: '*',
   },
 ];

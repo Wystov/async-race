@@ -18,7 +18,7 @@
     "src/**/*.ts",
     "src/**/*.d.ts",
     ".eslintrc.js",
-    "webpack.config.js",
+    "webpack.config.cjs",
     "test/**/*.ts",
   ]
 }
