@@ -15,6 +15,11 @@ export type ElementList = Record<string, HTMLElement>;
 
 export type ResolvePath = HTMLElement | ElementList;
 
+export interface CarsResponse {
+  cars: Car[];
+  totalCount: number;
+}
+
 export interface Car {
   name: string;
   color: string;

@@ -1,5 +1,5 @@
 import type { EventEmitter } from '../../utils/event-emitter';
-import type { Car } from '../../utils/types';
+import type { Car, CarsResponse } from '../../utils/types';
 import { APIHandler } from '../api-handler/api-handler';
 import './car.scss';
 import { carImage } from '../../data/car-image';
@@ -15,13 +15,22 @@ export class Garage {
   private raceControls: Record<string, HTMLElement> = {};
   private createCarPopup: Record<string, HTMLElement> = {};
   private readonly tempCarDataStorage: Partial<Car> = {};
-  private readonly cars: Array<Record<string, HTMLElement>> = [];
+  private cars: Array<Record<string, HTMLElement>> = [];
+  private currentPage = 1;
+  private totalCars = 0;
 
   constructor(parent: HTMLElement, private readonly emitter: EventEmitter) {
     this.createRaceControls(parent);
-    APIHandler.getCars()
+    this.getCars(1, parent);
+  }
+
+  private getCars(page: number, parent?: HTMLElement): void {
+    APIHandler.getCars(page)
       .then((cars) => {
-        this.createGarage(parent, cars);
+        if (parent instanceof HTMLElement) {
+          this.createGarage(parent, cars);
+        }
+        this.fillGarage(cars);
       })
       .catch((e) => {
         console.error(e);
@@ -35,20 +44,55 @@ export class Garage {
     ).getElements();
   }
 
-  private createGarage(parent: HTMLElement, cars: Car[]): void {
+  private createGarage(parent: HTMLElement, response: CarsResponse): void {
+    this.totalCars = response.totalCount;
     this.garage = new SectionCreator(garageElements, parent).getElements();
-    const { createCarBtn, generateCarsBtn, title } = this.garage;
+    const { createCarBtn, generateCarsBtn, title, controls } = this.garage;
+    const { toFirstPage, toPrevPage, currentPage, toNextPage, toLastPage } =
+      this.garage;
     createCarBtn.addEventListener('click', () => {
-      this.showCreateCar(this.garage.controls, 'create');
+      this.showCreateCar(controls, 'create');
     });
     generateCarsBtn.addEventListener('click', this.generateCars.bind(this));
-    title.textContent = `Garage (${cars.length})`;
+    title.textContent = `Garage (${this.totalCars})`;
+    currentPage.textContent = this.currentPage.toString();
+    toFirstPage.addEventListener('click', () => {
+      this.currentPage = 1;
+      currentPage.textContent = this.currentPage.toString();
+      this.getCars(1);
+    });
+    toPrevPage.addEventListener('click', () => {
+      if (this.currentPage === 1) return;
+      this.currentPage -= 1;
+      currentPage.textContent = this.currentPage.toString();
+      this.getCars(this.currentPage);
+    });
+    toNextPage.addEventListener('click', () => {
+      const lastPageNum = Math.ceil(this.totalCars / 7);
+      if (this.currentPage === lastPageNum || lastPageNum === 0) return;
+      this.currentPage += 1;
+      currentPage.textContent = this.currentPage.toString();
+      this.getCars(this.currentPage);
+    });
+    toLastPage.addEventListener('click', () => {
+      const lastPageNum = Math.ceil(this.totalCars / 7);
+      this.currentPage = lastPageNum > 0 ? lastPageNum : 1;
+      currentPage.textContent = this.currentPage.toString();
+      this.getCars(this.currentPage);
+    });
+  }
+
+  private fillGarage(response: CarsResponse): void {
+    this.cars.length = 0;
+    const { cars } = response;
+    this.garage.carElements.innerHTML = '';
     cars.forEach((car) => {
       this.createCarElement(car);
     });
   }
 
   private createCarElement(car: Car): void {
+    if (this.cars.length === 7) return;
     const { carElements } = this.garage;
     const carElement = new SectionCreator(
       carElementsData,
@@ -77,6 +121,15 @@ export class Garage {
       createCarPopupData,
       parent
     ).getElements();
+    const { nameInput, colorPicker } = this.createCarPopup;
+    if (
+      !(nameInput instanceof HTMLInputElement) ||
+      !(colorPicker instanceof HTMLInputElement)
+    ) {
+      return;
+    }
+    nameInput.value = this.generateRandomName();
+    colorPicker.value = this.generateRandomColor();
     // eslint-disable-next-line prettier/prettier
     const callback = todo === 'create' ? this.addCar.bind(this) : this.modifyCar.bind(this);
     this.createCarPopup.createBtn.addEventListener('click', () => {
@@ -105,9 +158,8 @@ export class Garage {
     APIHandler.createCar({ name: nameValue, color: colorValue })
       .then((car) => {
         this.createCarElement(car);
-        const carsCount =
-          this.garage.title.textContent?.replace(/[^0-9]/g, '') ?? 0;
-        this.garage.title.textContent = `Garage (${+carsCount + 1})`;
+        this.totalCars += 1;
+        this.garage.title.textContent = `Garage (${this.totalCars})`;
         if (this.createCarPopup.container !== undefined) {
           this.createCarPopup.container.innerHTML = '';
         }
@@ -127,11 +179,17 @@ export class Garage {
     APIHandler.deleteCar(+carId)
       .then((ok) => {
         if (!ok) throw new Error("can't delete car");
-        const carElement = target.closest('.car');
-        if (carElement !== null) carElement.remove();
         const { title } = this.garage;
-        const carsCount = title.textContent?.replace(/[^0-9]/g, '') ?? 0;
-        title.textContent = `Garage (${+carsCount - 1})`;
+        this.totalCars -= 1;
+        title.textContent = `Garage (${+this.totalCars})`;
+        this.cars = this.cars.filter(
+          (car) => car.modifyBtn.dataset.id !== carId.toString()
+        );
+        if (this.cars.length === 0) {
+          this.currentPage = this.currentPage > 1 ? this.currentPage - 1 : 1;
+          this.garage.currentPage.textContent = this.currentPage.toString();
+        }
+        this.getCars(this.currentPage);
       })
       .catch((err) => {
         console.log(err);

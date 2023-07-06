@@ -1,12 +1,22 @@
-import type { Car, CarParams, EngineStatus, Winner } from '../../utils/types';
+import type {
+  Car,
+  CarParams,
+  CarsResponse,
+  EngineStatus,
+  Winner,
+} from '../../utils/types';
 
 export class APIHandler {
   private static readonly baseUrl = 'http://127.0.0.1:3000';
 
-  public static async getCars(): Promise<Car[]> {
-    const request = await fetch(`${this.baseUrl}/garage`);
-    const cars = await request.json();
-    return cars;
+  public static async getCars(page: number): Promise<CarsResponse> {
+    const request = await fetch(
+      `${this.baseUrl}/garage?_page=${page}&_limit=7`
+    );
+    const cars: Car[] = await request.json();
+    const totalCount = request.headers.get('X-Total-Count');
+    if (totalCount === null) throw new Error("can't get cars amount");
+    return { cars, totalCount: +totalCount };
   }
 
   public static async getCar(id: number): Promise<Car> {
