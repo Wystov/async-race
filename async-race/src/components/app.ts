@@ -1,10 +1,12 @@
 import { ElementCreator } from '../utils/element-creator';
+import { SectionCreator } from '../utils/section-creator';
 import { EventEmitter } from '../utils/event-emitter';
 import { Garage } from './garage/garage';
+import { headerElements } from '../data/page-elements.ts/header';
 
 export class App {
   private readonly emitter = new EventEmitter();
-  private readonly header: Record<string, HTMLElement> = {};
+  private header: Record<string, HTMLElement> = {};
   private page!: Garage;
 
   constructor() {
@@ -16,23 +18,7 @@ export class App {
   }
 
   private createHeader(root: HTMLElement): void {
-    const header = new ElementCreator({
-      tagName: 'header',
-      classes: ['header'],
-      parent: root,
-    }).getNode();
-    this.header.garageBtn = new ElementCreator({
-      tagName: 'button',
-      classes: ['button', 'header__button', 'header__button--garage'],
-      textContent: 'garage',
-      parent: header,
-    }).getNode();
-    this.header.winnersBtn = new ElementCreator({
-      tagName: 'button',
-      classes: ['button', 'header__button', 'header__button--winners'],
-      textContent: 'winners',
-      parent: header,
-    }).getNode();
+    this.header = new SectionCreator(headerElements, root).getElements();
   }
 
   private createBody(root: HTMLElement): void {

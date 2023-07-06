@@ -1,3 +1,8 @@
+export interface BaseElement {
+  key: string;
+  value: BaseElementOptions;
+}
+
 export interface BaseElementOptions {
   tagName?: string;
   classes?: string[];
@@ -5,6 +10,10 @@ export interface BaseElementOptions {
   parent?: HTMLElement | string | null;
   attributes?: Record<string, string> | null;
 }
+
+export type ElementList = Record<string, HTMLElement>;
+
+export type ResolvePath = HTMLElement | ElementList;
 
 export interface Car {
   name: string;

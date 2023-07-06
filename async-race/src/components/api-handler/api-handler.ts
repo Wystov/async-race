@@ -27,16 +27,20 @@ export class APIHandler {
     return response;
   }
 
-  public static async deleteCar(id: number): Promise<void> {
-    await fetch(`${this.baseUrl}/garage/${id}`, { method: 'DELETE' });
+  public static async deleteCar(id: number): Promise<boolean> {
+    const request = await fetch(`${this.baseUrl}/garage/${id}`, {
+      method: 'DELETE',
+    });
+    return request.ok;
   }
 
-  public static async updateCar(id: number, car: Car): Promise<void> {
-    await fetch(`${this.baseUrl}/garage/${id}`, {
+  public static async updateCar(id: number, car: Car): Promise<boolean> {
+    const request = await fetch(`${this.baseUrl}/garage/${id}`, {
       method: 'PUT',
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify(car),
     });
+    return request.ok;
   }
 
   public static async toggleEngine(
