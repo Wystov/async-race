@@ -8,6 +8,7 @@ import { raceControlElements } from '../../data/page-elements.ts/garage/race-con
 import { garageElements } from '../../data/page-elements.ts/garage/garage-elements';
 import { carElementsData } from '../../data/page-elements.ts/garage/car-element';
 import { createCarPopupData } from '../../data/page-elements.ts/garage/create-car-popup-element';
+import { carNames } from '../../data/car-names';
 
 export class Garage {
   private garage: Record<string, HTMLElement> = {};
@@ -35,12 +36,12 @@ export class Garage {
   }
 
   private createGarage(parent: HTMLElement, cars: Car[]): void {
-    console.log(cars);
     this.garage = new SectionCreator(garageElements, parent).getElements();
-    const { createCarBtn, title } = this.garage;
+    const { createCarBtn, generateCarsBtn, title } = this.garage;
     createCarBtn.addEventListener('click', () => {
       this.showCreateCar(this.garage.controls, 'create');
     });
+    generateCarsBtn.addEventListener('click', this.generateCars.bind(this));
     title.textContent = `Garage (${cars.length})`;
     cars.forEach((car) => {
       this.createCarElement(car);
@@ -76,27 +77,40 @@ export class Garage {
       createCarPopupData,
       parent
     ).getElements();
-    this.createCarPopup.createBtn.addEventListener(
-      'click',
-      todo === 'create' ? this.addCar.bind(this) : this.modifyCar.bind(this)
-    );
+    // eslint-disable-next-line prettier/prettier
+    const callback = todo === 'create' ? this.addCar.bind(this) : this.modifyCar.bind(this);
+    this.createCarPopup.createBtn.addEventListener('click', () => {
+      callback();
+    });
   }
 
-  private addCar(): void {
-    const { nameInput, colorPicker } = this.createCarPopup;
-    if (
-      !(nameInput instanceof HTMLInputElement) ||
-      !(colorPicker instanceof HTMLInputElement)
-    ) {
-      throw new Error('wrong type');
+  private addCar(name?: string, color?: string): void {
+    let nameValue;
+    let colorValue;
+    if (name !== undefined && color !== undefined) {
+      nameValue = name;
+      colorValue = color;
+    } else {
+      const { nameInput, colorPicker } = this.createCarPopup;
+      if (
+        !(nameInput instanceof HTMLInputElement) ||
+        !(colorPicker instanceof HTMLInputElement)
+      ) {
+        throw new Error('wrong type');
+      }
+      nameValue = nameInput.value;
+      colorValue = colorPicker.value;
     }
-    APIHandler.createCar({ name: nameInput.value, color: colorPicker.value })
+
+    APIHandler.createCar({ name: nameValue, color: colorValue })
       .then((car) => {
         this.createCarElement(car);
         const carsCount =
           this.garage.title.textContent?.replace(/[^0-9]/g, '') ?? 0;
         this.garage.title.textContent = `Garage (${+carsCount + 1})`;
-        this.createCarPopup.container.innerHTML = '';
+        if (this.createCarPopup.container !== undefined) {
+          this.createCarPopup.container.innerHTML = '';
+        }
         if (this.garage.createCarBtn instanceof HTMLButtonElement) {
           this.garage.createCarBtn.disabled = false;
         }
@@ -177,5 +191,30 @@ export class Garage {
       .catch((err) => {
         console.log(err);
       });
+  }
+
+  private generateCars(): void {
+    const CARS_AMOUNT = 100;
+    for (let i = 0; i < CARS_AMOUNT; i++) {
+      const name = this.generateRandomName();
+      const color = this.generateRandomColor();
+      this.addCar(name, color);
+    }
+  }
+
+  private generateRandomName(): string {
+    const brands = Object.keys(carNames);
+    const randomBrand = brands[Math.floor(Math.random() * brands.length)];
+    const models = carNames[randomBrand];
+    const randomModel = models[Math.floor(Math.random() * models.length)];
+    return `${randomBrand} ${randomModel}`;
+  }
+
+  private generateRandomColor(): string {
+    let color = '';
+    for (let i = 0; i < 3; i++) {
+      color += Math.floor(Math.random() * 256).toString(16);
+    }
+    return `#${color.padStart(6, '0').toUpperCase()}`;
   }
 }
