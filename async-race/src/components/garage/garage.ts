@@ -1,5 +1,10 @@
 import type { EventEmitter } from '../../utils/event-emitter';
-import type { Car, CarsResponse } from '../../utils/types';
+import type {
+  Car,
+  CarParams,
+  CarsResponse,
+  EngineStatus,
+} from '../../utils/types';
 import { APIHandler } from '../api-handler/api-handler';
 import './car.scss';
 import { carImage } from '../../data/car-image';
@@ -101,15 +106,33 @@ export class Garage {
     carElement.name.textContent = car.name;
     carElement.image.innerHTML = carImage;
     carElement.image.children[0].setAttribute('fill', car.color);
-    carElement.deleteBtn.dataset.id = (car.id ?? 0).toString();
-    carElement.modifyBtn.dataset.id = (car.id ?? 0).toString();
-    carElement.modifyBtn.dataset.color = car.color;
-    carElement.modifyBtn.dataset.name = car.name;
+    carElement.controls.dataset.id = (car.id ?? 0).toString();
+    carElement.controls.dataset.color = car.color;
+    carElement.controls.dataset.name = car.name;
+    const { startEngineBtn, stopEngineBtn } = carElement;
+    if (
+      !(startEngineBtn instanceof HTMLButtonElement) ||
+      !(stopEngineBtn instanceof HTMLButtonElement)
+    ) {
+      throw new TypeError('not a button element :(');
+    }
+    stopEngineBtn.disabled = false;
+    stopEngineBtn.disabled = true;
     carElement.deleteBtn.addEventListener('click', this.deleteCar.bind(this));
     carElement.modifyBtn.addEventListener(
       'click',
       this.showModifyCar.bind(this)
     );
+    carElement.startEngineBtn.addEventListener('click', (e) => {
+      startEngineBtn.disabled = !startEngineBtn.disabled;
+      stopEngineBtn.disabled = !startEngineBtn.disabled;
+      this.startEngine(e, 'started');
+    });
+    carElement.stopEngineBtn.addEventListener('click', (e) => {
+      startEngineBtn.disabled = !startEngineBtn.disabled;
+      stopEngineBtn.disabled = !startEngineBtn.disabled;
+      this.startEngine(e, 'stopped');
+    });
     this.cars.push(carElement);
   }
 
@@ -175,7 +198,7 @@ export class Garage {
   private deleteCar(e: MouseEvent): void {
     const { target } = e;
     if (!(target instanceof HTMLElement)) throw new Error('wrong target');
-    const carId = target.dataset.id ?? 0;
+    const carId = target.parentElement?.dataset.id ?? 0;
     APIHandler.deleteCar(+carId)
       .then((ok) => {
         if (!ok) throw new Error("can't delete car");
@@ -183,7 +206,7 @@ export class Garage {
         this.totalCars -= 1;
         title.textContent = `Garage (${+this.totalCars})`;
         this.cars = this.cars.filter(
-          (car) => car.modifyBtn.dataset.id !== carId.toString()
+          (car) => car.controls.dataset.id !== carId.toString()
         );
         if (this.cars.length === 0) {
           this.currentPage = this.currentPage > 1 ? this.currentPage - 1 : 1;
@@ -198,10 +221,14 @@ export class Garage {
 
   private showModifyCar(e: MouseEvent): void {
     if (!(e.target instanceof HTMLElement)) return;
-    const parent = e.target.closest('.car');
-    if (parent === null || !(parent instanceof HTMLElement)) return;
-    this.showCreateCar(parent, 'modify');
-    const { name, color, id } = e.target.dataset;
+    const dataElement = e.target.parentElement;
+    if (dataElement === null) return;
+    const { name, color, id } = dataElement.dataset;
+    const carElement = this.cars.find(
+      (car) => car.controls.dataset.id === (id ?? 0).toString()
+    );
+    if (carElement === undefined) return;
+    this.showCreateCar(carElement.container, 'modify');
     Object.assign(this.tempCarDataStorage, { name, color, id });
     const { nameInput, colorPicker, createBtn } = this.createCarPopup;
     if (
@@ -234,13 +261,13 @@ export class Garage {
       .then((ok) => {
         if (!ok) throw new Error("can't update car");
         const carElement = this.cars.find(
-          (car) => car.modifyBtn.dataset.id === id.toString()
+          (car) => car.controls.dataset.id === id.toString()
         );
         if (carElement === undefined) return;
         carElement.name.textContent = nameInput.value;
         carElement.image.children[0].setAttribute('fill', colorPicker.value);
-        carElement.modifyBtn.dataset.color = colorPicker.value;
-        carElement.modifyBtn.dataset.name = nameInput.value;
+        carElement.controls.dataset.color = colorPicker.value;
+        carElement.controls.dataset.name = nameInput.value;
         this.createCarPopup.container.innerHTML = '';
         if (this.garage.createCarBtn instanceof HTMLButtonElement) {
           this.garage.createCarBtn.disabled = false;
@@ -273,6 +300,24 @@ export class Garage {
     for (let i = 0; i < 3; i++) {
       color += Math.floor(Math.random() * 256).toString(16);
     }
-    return `#${color.padStart(6, '0').toUpperCase()}`;
+    return `#${color.padStart(6, '0')}`;
+  }
+
+  private startEngine(e: MouseEvent, command: EngineStatus): void {
+    const { target } = e;
+    if (!(target instanceof HTMLElement)) return;
+    const dataElement = target.parentElement;
+    if (dataElement === null) return;
+    const { id } = dataElement.dataset;
+    if (id === undefined) return;
+    APIHandler.toggleEngine(+id, command)
+      .then((carParams: CarParams) => {
+        const { velocity, distance } = carParams;
+        const animationTime = Math.round(distance / velocity);
+        console.log(carParams, animationTime);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   }
 }
