@@ -1,5 +1,5 @@
 // eslint-disable-next-line prettier/prettier
-import type { BtnEl, BtnMethod, Car, CarsResponse, ElementList, EngineStatus } from '../../utils/types';
+import type { BtnEl, BtnMethod, Car, CarElement, CarsResponse, Engine } from '../../utils/types';
 import { isButton, isInput, isHtmlElement } from '../../utils/type-guards';
 import { APIHandler } from '../api-handler/api-handler';
 import { GarageView } from './garage-view';
@@ -61,11 +61,28 @@ export class GarageController {
       .catch((err) => console.log(err));
   }
 
-  private toggleEngine(id: number, command: EngineStatus): void {
+  private toggleEngine(id: number, command: Engine, car: CarElement): void {
     APIHandler.toggleEngine(id, command)
       .then(({ velocity, distance }) => {
-        const animationTime = Math.round(distance / velocity);
-        console.log(velocity, distance, animationTime);
+        if (velocity > 0) {
+          const animationTime = Math.round(distance / velocity);
+          car.animation = this.view.moveCar(animationTime, car.image);
+          this.toDriveMode(id, car.animation);
+        } else {
+          car.animation?.cancel();
+          delete car.animation;
+        }
+      })
+      .catch((err) => console.log(err));
+  }
+
+  private toDriveMode(id: number, animation: Animation): void {
+    APIHandler.driveMode(id)
+      .then((response) => {
+        if (typeof response === 'string') {
+          animation.pause();
+          console.warn(response);
+        }
       })
       .catch((err) => console.log(err));
   }
@@ -124,16 +141,16 @@ export class GarageController {
     }
   }
 
-  private addListenersToCar(carElement: ElementList): void {
+  private addListenersToCar(carElement: CarElement): void {
     const { startEngineBtn, stopEngineBtn, deleteBtn, modifyBtn } = carElement;
     if (!isButton(startEngineBtn) || !isButton(stopEngineBtn)) {
       throw new TypeError('not a button element :(');
     }
     stopEngineBtn.disabled = true;
-    deleteBtn.addEventListener('click', (e) => {
+    deleteBtn.addEventListener('click', (e: MouseEvent) => {
       this.handleCarBtn(e, 'delete');
     });
-    modifyBtn.addEventListener('click', (e) => {
+    modifyBtn.addEventListener('click', (e: MouseEvent) => {
       this.handleCarBtn(e, 'modify');
     });
     startEngineBtn.addEventListener('click', (e) => {
@@ -146,6 +163,7 @@ export class GarageController {
 
   private handleCarBtn(e: MouseEvent, todo: BtnMethod, buttons?: BtnEl): void {
     const data = this.extractCarDataFromEvent(e);
+    const carElement = this.view.getCarElement(data.id ?? 0);
     switch (todo) {
       case 'delete':
         this.deleteCar(data.id ?? 0);
@@ -156,7 +174,7 @@ export class GarageController {
       case 'started':
       case 'stopped':
         if (buttons !== undefined) this.view.toggleEngineBtns(...buttons);
-        this.toggleEngine(data.id ?? 0, todo);
+        this.toggleEngine(data.id ?? 0, todo, carElement);
     }
   }
 

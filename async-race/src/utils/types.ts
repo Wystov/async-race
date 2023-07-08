@@ -13,6 +13,10 @@ export interface BaseElementOptions {
 
 export type ElementList = Record<string, HTMLElement>;
 
+export type CarElement = {
+  animation?: Animation;
+} & ElementList;
+
 export type ResolvePath = HTMLElement | ElementList;
 
 export interface CarsResponse {
@@ -26,7 +30,7 @@ export interface Car {
   id?: number;
 }
 
-export type EngineStatus = 'started' | 'stopped';
+export type Engine = 'started' | 'stopped';
 
 export interface CarParams {
   velocity: number;

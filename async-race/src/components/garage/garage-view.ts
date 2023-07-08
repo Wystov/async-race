@@ -1,4 +1,4 @@
-import type { Car, ElementList } from '../../utils/types';
+import type { Car, CarElement, ElementList } from '../../utils/types';
 import { isButton, isInput } from '../../utils/type-guards';
 import { SectionCreator } from '../../utils/section-creator';
 import { generateRandomName, generateRandomColor } from '../../utils/helpers';
@@ -10,7 +10,7 @@ import { raceControlElements } from '../../data/page-elements.ts/garage/race-con
 
 export class GarageView {
   public garage: ElementList = {};
-  public cars: ElementList[] = [];
+  public cars: CarElement[] = [];
   private raceControls: ElementList = {};
   public createCarPopup: ElementList = {};
 
@@ -26,7 +26,7 @@ export class GarageView {
     this.garage = new SectionCreator(garageElements, parent).getElements();
   }
 
-  public createCarElement(car: Car): ElementList {
+  public createCarElement(car: Car): CarElement {
     const { carElements } = this.garage;
     const carElement = new SectionCreator(
       carElementsData,
@@ -77,9 +77,7 @@ export class GarageView {
   public showModifyCar(data: Car, callback: (id: number) => void): void {
     if (this.createCarPopup.container !== undefined) return;
     const { id, name, color } = data;
-    const carElement = this.cars.find(
-      (car) => car.controls.dataset.id === (id ?? 0).toString()
-    );
+    const carElement = this.getCarElement(id ?? 0);
     if (carElement === undefined) return;
     this.showCreateCar(carElement.container, () => {
       callback(id ?? 0);
@@ -121,9 +119,7 @@ export class GarageView {
 
   public modifyCarElement(props: Car): void {
     const { id, color, name } = props;
-    const carElement = this.cars.find(
-      (car) => car.controls.dataset.id === (id ?? 0).toString()
-    );
+    const carElement = this.getCarElement(id ?? 0);
     if (carElement === undefined) return;
     carElement.name.textContent = name;
     carElement.image.children[0].setAttribute('fill', color);
@@ -132,5 +128,27 @@ export class GarageView {
     this.removeCarPopup();
     const { createCarBtn } = this.garage;
     if (isButton(createCarBtn)) createCarBtn.disabled = false;
+  }
+
+  public getCarElement(id: number): CarElement {
+    const element = this.cars.find(
+      (car) => car.controls.dataset.id === id.toString()
+    );
+    if (element === undefined) throw new Error("can't find car element");
+    return element;
+  }
+
+  public moveCar(animationTime: number, carImg: HTMLElement): Animation {
+    const start = `${carImg.getBoundingClientRect().left}px`;
+    const finish = `${document.body.clientWidth - carImg.clientWidth}px`;
+    const properties = [
+      { transform: `translateX(${start}` },
+      { transform: `translateX(${finish}` },
+    ];
+    const options: KeyframeAnimationOptions = {
+      duration: animationTime,
+      fill: 'forwards',
+    };
+    return carImg.animate(properties, options);
   }
 }

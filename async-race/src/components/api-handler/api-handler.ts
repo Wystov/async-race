@@ -1,10 +1,5 @@
-import type {
-  Car,
-  CarParams,
-  CarsResponse,
-  EngineStatus,
-  Winner,
-} from '../../utils/types';
+// eslint-disable-next-line prettier/prettier
+import type { Car, CarParams, CarsResponse, Engine, Winner } from '../../utils/types';
 
 export class APIHandler {
   private static readonly baseUrl = 'http://127.0.0.1:3000';
@@ -55,7 +50,7 @@ export class APIHandler {
 
   public static async toggleEngine(
     id: number,
-    status: EngineStatus
+    status: Engine
   ): Promise<CarParams> {
     const queryParams = `?id=${id}&status=${status}`;
     const request = await fetch(`${this.baseUrl}/engine/${queryParams}`, {
@@ -65,13 +60,17 @@ export class APIHandler {
     return carParams;
   }
 
-  public static async driveMode(id: number): Promise<void> {
+  public static async driveMode(id: number): Promise<Response | string> {
     const queryParams = `?id=${id}&status=drive`;
     const request = await fetch(`${this.baseUrl}/engine/${queryParams}`, {
       method: 'PATCH',
     });
-    const data = await request.json();
-    console.log(data);
+    if (!request.ok) {
+      const responseText = await request.text();
+      return responseText;
+    }
+    const response = await request.json();
+    return response;
   }
 
   public static async getWinners(): Promise<Winner[]> {
