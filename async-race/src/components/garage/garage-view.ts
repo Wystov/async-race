@@ -11,7 +11,7 @@ import { raceControlElements } from '../../data/page-elements.ts/garage/race-con
 export class GarageView {
   public garage: ElementList = {};
   public cars: CarElement[] = [];
-  private raceControls: ElementList = {};
+  public raceControls: ElementList = {};
   public createCarPopup: ElementList = {};
 
   constructor(parent: HTMLElement) {
@@ -115,6 +115,16 @@ export class GarageView {
     this.cars = this.cars.filter(
       (car) => car.controls.dataset.id !== carId.toString()
     );
+  }
+
+  public extractInputValues(): { name: string; color: string } {
+    const { nameInput, colorPicker } = this.createCarPopup;
+    if (!isInput(nameInput) || !isInput(colorPicker)) {
+      throw new TypeError('not an input element :(');
+    }
+    const name = nameInput.value;
+    const color = colorPicker.value;
+    return { name, color };
   }
 
   public modifyCarElement(props: Car): void {

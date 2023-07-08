@@ -1,6 +1,6 @@
 // eslint-disable-next-line prettier/prettier
 import type { BtnEl, BtnMethod, Car, CarElement, CarsResponse, Engine } from '../../utils/types';
-import { isButton, isInput, isHtmlElement } from '../../utils/type-guards';
+import { isButton, isHtmlElement } from '../../utils/type-guards';
 import { APIHandler } from '../api-handler/api-handler';
 import { GarageView } from './garage-view';
 import { generateRandomName, generateRandomColor } from '../../utils/helpers';
@@ -51,7 +51,7 @@ export class GarageController {
   }
 
   private modifyCar(id: number): void {
-    const { name, color } = this.extractInputValues();
+    const { name, color } = this.view.extractInputValues();
     if (id === undefined) return;
     APIHandler.updateCar(id, { name, color })
       .then((ok) => {
@@ -82,6 +82,8 @@ export class GarageController {
         if (typeof response === 'string') {
           animation.pause();
           console.warn(response);
+        } else {
+          console.log(response);
         }
       })
       .catch((err) => console.log(err));
@@ -92,12 +94,19 @@ export class GarageController {
     const { paginationBtns } = this.view.garage;
     createCarBtn.addEventListener('click', () => {
       this.view.showCreateCar(controls, () => {
-        const { name, color } = this.extractInputValues();
+        const { name, color } = this.view.extractInputValues();
         this.addCar.bind(this)(name, color);
       });
     });
     generateCarsBtn.addEventListener('click', this.generateCars.bind(this));
     paginationBtns.addEventListener('click', this.switchPage.bind(this));
+    const { startBtn, resetBtn } = this.view.raceControls;
+    startBtn.addEventListener('click', () => {
+      this.toggleRace('started');
+    });
+    resetBtn.addEventListener('click', () => {
+      this.toggleRace('stopped');
+    });
   }
 
   private switchPage(e: MouseEvent): void {
@@ -162,7 +171,7 @@ export class GarageController {
   }
 
   private handleCarBtn(e: MouseEvent, todo: BtnMethod, buttons?: BtnEl): void {
-    const data = this.extractCarDataFromEvent(e);
+    const data = this.extractCarData(e);
     const carElement = this.view.getCarElement(data.id ?? 0);
     switch (todo) {
       case 'delete':
@@ -178,18 +187,8 @@ export class GarageController {
     }
   }
 
-  private extractInputValues(): { name: string; color: string } {
-    const { nameInput, colorPicker } = this.view.createCarPopup;
-    if (!isInput(nameInput) || !isInput(colorPicker)) {
-      throw new TypeError('not an input element :(');
-    }
-    const name = nameInput.value;
-    const color = colorPicker.value;
-    return { name, color };
-  }
-
-  private extractCarDataFromEvent(e: MouseEvent): Car {
-    if (!isHtmlElement(e.target)) throw new Error('wrong target');
+  private extractCarData(e: MouseEvent): Car {
+    if (!isHtmlElement(e.target)) throw new Error("can't find car element");
     const element = e.target.parentElement;
     const id = +(element?.dataset.id ?? 0);
     const name = element?.dataset.name ?? '';
@@ -204,5 +203,12 @@ export class GarageController {
       const color = generateRandomColor();
       this.addCar(name, color);
     }
+  }
+
+  private toggleRace(method: 'started' | 'stopped'): void {
+    this.view.cars.forEach((car) => {
+      const id = car.controls.dataset.id ?? 0;
+      this.toggleEngine(+id, method, car);
+    });
   }
 }
