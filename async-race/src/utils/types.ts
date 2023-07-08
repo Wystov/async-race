@@ -40,3 +40,7 @@ export interface Winner {
 }
 
 export type UpdateWinner = Omit<Winner, 'id'>;
+
+export type BtnEl = [HTMLButtonElement, HTMLButtonElement];
+
+export type BtnMethod = 'delete' | 'modify' | 'started' | 'stopped';

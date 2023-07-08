@@ -49,6 +49,12 @@ module.exports = {
       'error',
       { multiline: { delimiter: 'semi' } },
     ],
+    '@typescript-eslint/no-confusing-void-expression': [
+      'error',
+      { ignoreArrowShorthand: true },
+    ],
+    'default-case': 'off',
+    'no-param-reassign': ['error', { props: false }],
     'prettier/prettier': ['error', { singleQuote: true }],
     'import/no-extraneous-dependencies': ['error', { devDependencies: true }],
   },

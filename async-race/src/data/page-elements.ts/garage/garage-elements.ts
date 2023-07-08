@@ -49,7 +49,7 @@ export const garageElements = [
     key: 'toFirstPage',
     value: {
       tagName: 'button',
-      classes: ['button', 'pagination__toFirst'],
+      classes: ['button', 'pagination__toInit'],
       textContent: '<<',
       parent: 'paginationBtns',
     },
