@@ -76,8 +76,9 @@ export class APIHandler {
     return response;
   }
 
-  public static async getWinner(id: number): Promise<Winner> {
+  public static async getWinner(id: number): Promise<Winner | null> {
     const request = await fetch(`${this.baseUrl}/winners/${id}`);
+    if (!request.ok) return null;
     const response: Winner = await request.json();
     return response;
   }

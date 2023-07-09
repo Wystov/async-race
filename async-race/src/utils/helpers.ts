@@ -1,4 +1,6 @@
 import { carNames } from '../data/car-names';
+import { isHtmlElement } from './type-guards';
+import type { Car } from './types';
 
 export const generateRandomName = (): string => {
   const brands = Object.keys(carNames);
@@ -14,4 +16,17 @@ export const generateRandomColor = (): string => {
     color += Math.floor(Math.random() * 256).toString(16);
   }
   return `#${color.padStart(6, '0')}`;
+};
+
+export const extractCarData = (e: MouseEvent): Car => {
+  if (!isHtmlElement(e.target)) throw new Error("can't find car element");
+  const element = e.target.parentElement;
+  const id = +(element?.dataset.id ?? 0);
+  const name = element?.dataset.name ?? '';
+  const color = element?.dataset.color ?? '';
+  return { id, name, color };
+};
+
+export const error = (e: Error): void => {
+  console.warn(e);
 };

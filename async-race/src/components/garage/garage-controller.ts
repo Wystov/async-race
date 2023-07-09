@@ -3,7 +3,7 @@ import type { BtnEl, BtnMethod, Car, CarElement, CarsResponse, Engine } from '..
 import { isButton, isHtmlElement } from '../../utils/type-guards';
 import { APIHandler } from '../api-handler/api-handler';
 import { GarageView } from './garage-view';
-import { generateRandomName, generateRandomColor } from '../../utils/helpers';
+import * as helpers from '../../utils/helpers';
 import './car.scss';
 
 export class GarageController {
@@ -22,7 +22,7 @@ export class GarageController {
   private getCars(page: number): void {
     APIHandler.getCars(page)
       .then((cars) => this.fillGarage(cars))
-      .catch((err) => console.error(err));
+      .catch(helpers.error);
   }
 
   private addCar(name: string, color: string): void {
@@ -34,22 +34,21 @@ export class GarageController {
         this.view.removeCarPopup();
         this.view.toggleCreateCarBtn();
       })
-      .catch((err) => console.log(err));
+      .catch(helpers.error);
   }
 
   private deleteCar(id: number): void {
     APIHandler.deleteCar(id)
       .then((ok) => {
         if (!ok) throw new Error("can't delete car");
-        this.totalCars -= 1;
-        this.view.removeStoredCar(id);
         if (this.view.cars.length === 0) {
           this.currentPage = this.currentPage > 1 ? this.currentPage - 1 : 1;
         }
         this.view.modifyElementsContent(this.totalCars, this.currentPage);
         this.getCars(this.currentPage);
       })
-      .catch((err) => console.log(err));
+      .catch(helpers.error);
+    APIHandler.deleteWinner(id).catch(helpers.error);
   }
 
   private modifyCar(id: number): void {
@@ -60,7 +59,7 @@ export class GarageController {
         if (!ok) throw new Error("can't update car");
         this.view.modifyCarElement({ id, name, color });
       })
-      .catch((err) => console.log(err));
+      .catch(helpers.error);
   }
 
   private toggleEngine(id: number, command: Engine, car: CarElement): void {
@@ -75,33 +74,47 @@ export class GarageController {
           delete car.animation;
         }
       })
-      .catch((err) => console.log(err));
+      .catch(helpers.error);
   }
 
   private toDriveMode(id: number, animation: Animation, time: number): void {
     APIHandler.driveMode(id)
       .then((response) => {
-        console.log(response, id, time);
         if (response !== 'success') {
           animation.pause();
           console.warn(response);
         } else if (this.raceMode && this.winner === undefined) {
           this.winner = { id, time };
-          this.getCar(id)
-            .then((car: Car) => {
-              this.view.showWinner(car, time);
-            })
-            .catch((err) => console.log(err));
+          this.handleWinner(id, time);
           this.raceMode = false;
           this.winner = undefined;
         }
       })
-      .catch((err) => console.log(err));
+      .catch(helpers.error);
   }
 
-  private async getCar(id: number): Promise<Car> {
-    const car = await APIHandler.getCar(id);
-    return car;
+  private handleWinner(id: number, time: number): void {
+    APIHandler.getCar(id)
+      .then((car: Car) => {
+        this.view.showWinner(car, time);
+        this.setWinner(id, time).catch(helpers.error);
+      })
+      .catch(helpers.error);
+  }
+
+  private async setWinner(id: number, newTime: number): Promise<void> {
+    try {
+      const winner = await APIHandler.getWinner(id);
+      if (winner === null) throw new Error('no record');
+      let { time, wins } = winner;
+      if (newTime < time) time = newTime;
+      wins += 1;
+      void APIHandler.updateWinner(id, { time, wins });
+    } catch (error) {
+      if ((error as Error).message === 'no record') {
+        void APIHandler.createWinner({ id, wins: 1, time: newTime });
+      }
+    }
   }
 
   private addListenersToPage(): void {
@@ -190,7 +203,7 @@ export class GarageController {
   }
 
   private handleCarBtn(e: MouseEvent, todo: BtnMethod, buttons?: BtnEl): void {
-    const data = this.extractCarData(e);
+    const data = helpers.extractCarData(e);
     const carElement = this.view.getCarElement(data.id ?? 0);
     switch (todo) {
       case 'delete':
@@ -206,20 +219,11 @@ export class GarageController {
     }
   }
 
-  private extractCarData(e: MouseEvent): Car {
-    if (!isHtmlElement(e.target)) throw new Error("can't find car element");
-    const element = e.target.parentElement;
-    const id = +(element?.dataset.id ?? 0);
-    const name = element?.dataset.name ?? '';
-    const color = element?.dataset.color ?? '';
-    return { id, name, color };
-  }
-
   private generateCars(): void {
     const CARS_AMOUNT = 100;
     for (let i = 0; i < CARS_AMOUNT; i++) {
-      const name = generateRandomName();
-      const color = generateRandomColor();
+      const name = helpers.generateRandomName();
+      const color = helpers.generateRandomColor();
       this.addCar(name, color);
     }
   }
