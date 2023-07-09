@@ -7,6 +7,7 @@ import { carElementsData } from '../../data/page-elements.ts/garage/car-element'
 import { createCarPopupData } from '../../data/page-elements.ts/garage/create-car-popup-element';
 import { garageElements } from '../../data/page-elements.ts/garage/garage-elements';
 import { raceControlElements } from '../../data/page-elements.ts/garage/race-control-elements';
+import { ElementCreator } from '../../utils/element-creator';
 
 export class GarageView {
   public garage: ElementList = {};
@@ -160,5 +161,21 @@ export class GarageView {
       fill: 'forwards',
     };
     return carImg.animate(properties, options);
+  }
+
+  public showWinner(car: Car, time: number): void {
+    this.garage.winnerPopup = new ElementCreator({
+      classes: ['garage__winner'],
+      textContent: `${car.name} wins in ${(time / 1000).toFixed(2)}seconds`,
+      parent: this.garage.garage,
+    }).getNode();
+  }
+
+  public hideWinner(): void {
+    const { winnerPopup } = this.garage;
+    if (winnerPopup instanceof HTMLElement) {
+      winnerPopup.remove();
+      delete this.garage.winnerPopup;
+    }
   }
 }

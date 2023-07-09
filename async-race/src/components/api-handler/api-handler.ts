@@ -60,17 +60,14 @@ export class APIHandler {
     return carParams;
   }
 
-  public static async driveMode(id: number): Promise<Response | string> {
+  public static async driveMode(id: number): Promise<string> {
     const queryParams = `?id=${id}&status=drive`;
-    const request = await fetch(`${this.baseUrl}/engine/${queryParams}`, {
+    const response = await fetch(`${this.baseUrl}/engine/${queryParams}`, {
       method: 'PATCH',
     });
-    if (!request.ok) {
-      const responseText = await request.text();
-      return responseText;
-    }
-    const response = await request.json();
-    return response;
+    if (response.ok) return 'success';
+    const error = await response.text();
+    return error;
   }
 
   public static async getWinners(): Promise<Winner[]> {

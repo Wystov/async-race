@@ -10,6 +10,8 @@ export class GarageController {
   private currentPage = 1;
   private totalCars = 0;
   private readonly view: GarageView;
+  private raceMode = false;
+  private winner: { id: number; time: number } | undefined;
 
   constructor(parent: HTMLElement) {
     this.view = new GarageView(parent);
@@ -67,7 +69,7 @@ export class GarageController {
         if (velocity > 0) {
           const animationTime = Math.round(distance / velocity);
           car.animation = this.view.moveCar(animationTime, car.image);
-          this.toDriveMode(id, car.animation);
+          this.toDriveMode(id, car.animation, animationTime);
         } else {
           car.animation?.cancel();
           delete car.animation;
@@ -76,17 +78,30 @@ export class GarageController {
       .catch((err) => console.log(err));
   }
 
-  private toDriveMode(id: number, animation: Animation): void {
+  private toDriveMode(id: number, animation: Animation, time: number): void {
     APIHandler.driveMode(id)
       .then((response) => {
-        if (typeof response === 'string') {
+        console.log(response, id, time);
+        if (response !== 'success') {
           animation.pause();
           console.warn(response);
-        } else {
-          console.log(response);
+        } else if (this.raceMode && this.winner === undefined) {
+          this.winner = { id, time };
+          this.getCar(id)
+            .then((car: Car) => {
+              this.view.showWinner(car, time);
+            })
+            .catch((err) => console.log(err));
+          this.raceMode = false;
+          this.winner = undefined;
         }
       })
       .catch((err) => console.log(err));
+  }
+
+  private async getCar(id: number): Promise<Car> {
+    const car = await APIHandler.getCar(id);
+    return car;
   }
 
   private addListenersToPage(): void {
@@ -102,9 +117,12 @@ export class GarageController {
     paginationBtns.addEventListener('click', this.switchPage.bind(this));
     const { startBtn, resetBtn } = this.view.raceControls;
     startBtn.addEventListener('click', () => {
+      this.raceMode = true;
       this.toggleRace('started');
     });
     resetBtn.addEventListener('click', () => {
+      this.raceMode = false;
+      this.view.hideWinner();
       this.toggleRace('stopped');
     });
   }
@@ -113,6 +131,7 @@ export class GarageController {
     if (!isHtmlElement(e.target)) return;
     const direction = e.target.classList[1].slice(-4).toLowerCase();
     const totalPages = Math.ceil(this.totalCars / 7);
+    this.view.hideWinner();
     switch (direction) {
       case 'init':
         this.currentPage = 1;
