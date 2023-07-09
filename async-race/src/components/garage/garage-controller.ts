@@ -1,6 +1,6 @@
 // eslint-disable-next-line prettier/prettier
 import type { BtnEl, BtnMethod, Car, CarElement, CarsResponse, Engine } from '../../utils/types';
-import { isButton, isHtmlElement } from '../../utils/type-guards';
+import { isButton } from '../../utils/type-guards';
 import { APIHandler } from '../api-handler/api-handler';
 import { GarageView } from './garage-view';
 import * as helpers from '../../utils/helpers';
@@ -8,6 +8,7 @@ import './car.scss';
 
 export class GarageController {
   private currentPage = 1;
+  private readonly itemsPerPage = 7;
   private totalCars = 0;
   private readonly view: GarageView;
   private raceMode = false;
@@ -141,27 +142,13 @@ export class GarageController {
   }
 
   private switchPage(e: MouseEvent): void {
-    if (!isHtmlElement(e.target)) return;
-    const direction = e.target.classList[1].slice(-4).toLowerCase();
-    const totalPages = Math.ceil(this.totalCars / 7);
+    const { currentPage, totalCars } = this;
+    this.currentPage =
+      helpers.getNewPageNumber(e, totalCars, currentPage, this.itemsPerPage) ??
+      currentPage;
+    console.log(this.currentPage);
     this.view.hideWinner();
-    switch (direction) {
-      case 'init':
-        this.currentPage = 1;
-        break;
-      case 'prev':
-        if (this.currentPage === 1) return;
-        this.currentPage -= 1;
-        break;
-      case 'next':
-        if (this.currentPage === totalPages || totalPages === 0) return;
-        this.currentPage += 1;
-        break;
-      case 'last':
-        this.currentPage = totalPages > 0 ? totalPages : 1;
-        break;
-    }
-    this.view.garage.currentPage.textContent = this.currentPage.toString();
+    this.view.modifyElementsContent(undefined, this.currentPage);
     this.getCars(this.currentPage);
   }
 

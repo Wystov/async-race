@@ -1,3 +1,4 @@
+/* eslint-disable consistent-return */
 import { carNames } from '../data/car-names';
 import { isHtmlElement } from './type-guards';
 import type { Car } from './types';
@@ -29,4 +30,27 @@ export const extractCarData = (e: MouseEvent): Car => {
 
 export const error = (e: Error): void => {
   console.warn(e);
+};
+
+export const getNewPageNumber = (
+  e: MouseEvent,
+  totalCars: number,
+  currentPage: number,
+  itemsPerPage: number
+): number | undefined => {
+  if (!isHtmlElement(e.target)) return;
+  const direction = e.target.classList[1].slice(-4).toLowerCase();
+  const totalPages = Math.ceil(totalCars / itemsPerPage);
+  switch (direction) {
+    case 'init':
+      return 1;
+    case 'prev':
+      if (currentPage === 1) return;
+      return currentPage - 1;
+    case 'next':
+      if (currentPage === totalPages || totalPages === 0) return;
+      return currentPage + 1;
+    case 'last':
+      return totalPages > 0 ? totalPages : 1;
+  }
 };

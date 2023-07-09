@@ -37,6 +37,11 @@ export interface CarParams {
   distance: number;
 }
 
+export interface WinnersResponse {
+  winners: Winner[];
+  totalCount: number;
+}
+
 export interface Winner {
   id: number;
   wins: number;
@@ -48,3 +53,7 @@ export type UpdateWinner = Omit<Winner, 'id'>;
 export type BtnEl = [HTMLButtonElement, HTMLButtonElement];
 
 export type BtnMethod = 'delete' | 'modify' | 'started' | 'stopped';
+
+export type SortBy = 'id' | 'wins' | 'time';
+
+export type SortOrder = 'ASC' | 'DESC';

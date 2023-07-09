@@ -1,5 +1,5 @@
 // eslint-disable-next-line prettier/prettier
-import type { Car, CarParams, CarsResponse, Engine, Winner } from '../../utils/types';
+import type { Car, CarParams, CarsResponse, Engine, SortBy, SortOrder, WinnersResponse, Winner } from '../../utils/types';
 
 export class APIHandler {
   private static readonly baseUrl = 'http://127.0.0.1:3000';
@@ -70,10 +70,18 @@ export class APIHandler {
     return error;
   }
 
-  public static async getWinners(): Promise<Winner[]> {
-    const request = await fetch(`${this.baseUrl}/winners`);
-    const response: Winner[] = await request.json();
-    return response;
+  public static async getWinners(
+    page: number,
+    sort: SortBy,
+    order: SortOrder
+  ): Promise<WinnersResponse> {
+    const request = await fetch(
+      `${this.baseUrl}/winners?_page=${page}&_limit=10&_sort=${sort}&_order=${order}`
+    );
+    const winners: Winner[] = await request.json();
+    const totalCount = request.headers.get('X-Total-Count');
+    if (totalCount === null) throw new Error("can't get winners amount");
+    return { winners, totalCount: +totalCount };
   }
 
   public static async getWinner(id: number): Promise<Winner | null> {

@@ -1,0 +1,47 @@
+.winners {
+  &__controls {
+    display: flex;
+  }
+
+  &__element {
+    display: flex;
+  }
+}
+
+.controls {
+
+  &__number {
+    width: 30px;
+    text-align: center;
+    display: grid;
+    place-items: center;
+  }
+
+  &__car,
+  &__name,
+  &__wins,
+  &__time {
+    width: 200px;
+    display: grid;
+    place-items: center;
+  }
+}
+
+.element {
+  border-top: 2px solid black;
+
+  &__number {
+    width: 30px;
+    display: grid;
+    place-items: center;
+  }
+
+  &__img,
+  &__name,
+  &__wins,
+  &__time {
+    width: 200px;
+    display: grid;
+    place-items: center;
+  }
+}
