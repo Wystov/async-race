@@ -45,17 +45,11 @@ module.exports = {
     'class-methods-use-this': 'off',
     '@typescript-eslint/comma-dangle': 'off',
     '@typescript-eslint/lines-between-class-members': 'off',
-    '@typescript-eslint/member-delimiter-style': [
-      'error',
-      { multiline: { delimiter: 'semi' } },
-    ],
-    '@typescript-eslint/no-confusing-void-expression': [
-      'error',
-      { ignoreArrowShorthand: true },
-    ],
+    '@typescript-eslint/member-delimiter-style': ['error', { multiline: { delimiter: 'semi' } }],
+    '@typescript-eslint/no-confusing-void-expression': ['error', { ignoreArrowShorthand: true }],
     'default-case': 'off',
     'no-param-reassign': ['error', { props: false }],
-    'prettier/prettier': ['error', { singleQuote: true }],
+    'prettier/prettier': ['error', { singleQuote: true, printWidth: 100 }],
     'import/no-extraneous-dependencies': ['error', { devDependencies: true }],
   },
 };

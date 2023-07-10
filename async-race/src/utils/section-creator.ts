@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 import { ElementCreator } from './element-creator';
 import type { BaseElement, ElementList, ResolvePath } from './types';
 
@@ -13,7 +12,8 @@ export class SectionCreator {
     data.forEach((element) => {
       const { value } = element;
       const node = new ElementCreator(value);
-      const parent = typeof value.parent === 'string' ? this.resolveParent(value.parent) : parentSection;
+      const parent =
+        typeof value.parent === 'string' ? this.resolveParent(value.parent) : parentSection;
       node.appendTo(parent);
       this.elements[element.key] = node.getNode();
     });

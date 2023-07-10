@@ -3,7 +3,7 @@ import { SectionCreator } from '../utils/section-creator';
 import { GarageController } from './garage/garage-controller';
 import { headerElements } from '../data/page-elements.ts/header';
 import { WinnersController } from './winners/winners-controller';
-import { toggleButtons } from '../utils/helpers';
+import { disableButtons } from '../utils/helpers';
 import { State } from './state/state';
 
 export class App {
@@ -28,16 +28,15 @@ export class App {
     garageBtn.addEventListener('click', () => {
       page.innerHTML = '';
       this.page = new GarageController(page, this.state);
-      toggleButtons([garageBtn, winnersBtn]);
-      console.log(this);
+      disableButtons([garageBtn], true);
+      disableButtons([winnersBtn], false);
     });
     winnersBtn.addEventListener('click', () => {
       page.innerHTML = '';
       this.page = new WinnersController(page, this.state);
-      toggleButtons([garageBtn, winnersBtn]);
-      console.log(this);
+      disableButtons([garageBtn], false);
+      disableButtons([winnersBtn], true);
     });
     garageBtn.click();
-    toggleButtons([winnersBtn]);
   }
 }

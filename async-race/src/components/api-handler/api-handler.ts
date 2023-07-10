@@ -5,9 +5,7 @@ export class APIHandler {
   private static readonly baseUrl = 'http://127.0.0.1:3000';
 
   public static async getCars(page: number): Promise<CarsResponse> {
-    const request = await fetch(
-      `${this.baseUrl}/garage?_page=${page}&_limit=7`
-    );
+    const request = await fetch(`${this.baseUrl}/garage?_page=${page}&_limit=7`);
     const cars: Car[] = await request.json();
     const totalCount = request.headers.get('X-Total-Count');
     if (totalCount === null) throw new Error("can't get cars amount");
@@ -48,10 +46,7 @@ export class APIHandler {
     return request.ok;
   }
 
-  public static async toggleEngine(
-    id: number,
-    status: Engine
-  ): Promise<CarParams> {
+  public static async toggleEngine(id: number, status: Engine): Promise<CarParams> {
     const queryParams = `?id=${id}&status=${status}`;
     const request = await fetch(`${this.baseUrl}/engine/${queryParams}`, {
       method: 'PATCH',
@@ -103,10 +98,7 @@ export class APIHandler {
     await fetch(`${this.baseUrl}/winners/${id}`, { method: 'DELETE' });
   }
 
-  public static async updateWinner(
-    id: number,
-    newResult: Omit<Winner, 'id'>
-  ): Promise<void> {
+  public static async updateWinner(id: number, newResult: Omit<Winner, 'id'>): Promise<void> {
     await fetch(`${this.baseUrl}/winners/${id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },

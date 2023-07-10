@@ -12,6 +12,8 @@ export class WinnersController {
     this.view = new WinnersView(parent);
     this.addListeners();
     this.getWinners();
+    const { currentPage, totalPages } = this.state.winners;
+    helpers.togglePaginationButtons(currentPage, totalPages, this.view.winners);
   }
 
   private getWinners(): void {
@@ -23,8 +25,8 @@ export class WinnersController {
 
   private async fillWinners(response: WinnersResponse): Promise<void> {
     this.state.winners.totalItems = response.totalCount;
-    const { totalItems, currentPage } = this.state.winners;
-    this.view.modifyElementsContent(totalItems, currentPage);
+    const { totalItems, currentPage, totalPages } = this.state.winners;
+    this.view.modifyElementsContent(totalItems, currentPage, totalPages);
     this.view.clearWinnersPage();
     const { winners } = response;
     winners.forEach((winner, i) => {
@@ -51,8 +53,9 @@ export class WinnersController {
 
   private switchPage(e: MouseEvent): void {
     this.state.setCurrentPage(e, 'winners');
-    const { currentPage } = this.state.winners;
-    this.view.modifyElementsContent(undefined, currentPage);
+    const { currentPage, totalPages } = this.state.winners;
+    helpers.togglePaginationButtons(currentPage, totalPages, this.view.winners);
+    this.view.modifyElementsContent(undefined, currentPage, totalPages);
     this.getWinners();
   }
 }

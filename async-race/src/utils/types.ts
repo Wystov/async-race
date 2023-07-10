@@ -63,6 +63,7 @@ export interface GarageState {
   itemsPerPage: number;
   totalItems: number;
   raceMode: boolean;
+  totalPages: number;
 }
 
 export interface WinnersState {
@@ -71,4 +72,5 @@ export interface WinnersState {
   totalItems: number;
   sortBy: SortBy;
   sortOrder: SortOrder;
+  totalPages: number;
 }

@@ -1,7 +1,7 @@
 import type { Car, CarElement, ElementList } from '../../utils/types';
 import { isButton, isHtmlElement, isInput } from '../../utils/type-guards';
 import { SectionCreator } from '../../utils/section-creator';
-import { generateRandomName, generateRandomColor } from '../../utils/helpers';
+import { generateName, generateColor } from '../../utils/helpers';
 import { carImage } from '../../data/car-image';
 import { carElementsData } from '../../data/page-elements.ts/garage/car-element';
 import { createCarPopupData } from '../../data/page-elements.ts/garage/create-car-popup-element';
@@ -20,19 +20,13 @@ export class GarageView {
   }
 
   private init(parent: HTMLElement): void {
-    this.raceControls = new SectionCreator(
-      raceControlElements,
-      parent
-    ).getElements();
+    this.raceControls = new SectionCreator(raceControlElements, parent).getElements();
     this.garage = new SectionCreator(garageElements, parent).getElements();
   }
 
   public createCarElement(car: Car): CarElement {
     const { carElements } = this.garage;
-    const carElement = new SectionCreator(
-      carElementsData,
-      carElements
-    ).getElements();
+    const carElement = new SectionCreator(carElementsData, carElements).getElements();
     const { name, image, controls } = carElement;
     name.textContent = car.name;
     image.innerHTML = carImage;
@@ -43,20 +37,17 @@ export class GarageView {
     return carElement;
   }
 
-  public modifyElementsContent(carsCount?: number, pageNum?: number): void {
+  public modifyElementsContent(carsCount?: number, pageNum?: number, totalPages?: number): void {
     const { title, currentPage } = this.garage;
     if (carsCount !== undefined) {
       title.textContent = `Garage (${carsCount})`;
     }
-    if (pageNum !== undefined) {
-      currentPage.textContent = pageNum.toString();
+    if (pageNum !== undefined && totalPages !== undefined) {
+      currentPage.textContent = `${pageNum.toString()} / ${totalPages.toString()}`;
     }
   }
 
-  public toggleEngineBtns(
-    start: HTMLButtonElement,
-    stop: HTMLButtonElement
-  ): void {
+  public toggleEngineBtns(start: HTMLButtonElement, stop: HTMLButtonElement): void {
     start.disabled = !start.disabled;
     stop.disabled = !stop.disabled;
   }
@@ -67,10 +58,7 @@ export class GarageView {
 
   public showCreateCar(parent: HTMLElement, callback: () => void): void {
     this.toggleCreateCarBtn();
-    this.createCarPopup = new SectionCreator(
-      createCarPopupData,
-      parent
-    ).getElements();
+    this.createCarPopup = new SectionCreator(createCarPopupData, parent).getElements();
     this.changeCarPopupValues('create');
     this.createCarPopup.createBtn.addEventListener('click', callback);
   }
@@ -92,10 +80,8 @@ export class GarageView {
   ): void {
     const { nameInput, colorPicker, createBtn } = this.createCarPopup;
     if (!isInput(nameInput) || !isInput(colorPicker)) return;
-    nameInput.value =
-      status === 'modify' ? props?.name ?? '' : generateRandomName();
-    colorPicker.value =
-      status === 'modify' ? props?.color ?? '' : generateRandomColor();
+    nameInput.value = status === 'modify' ? props?.name ?? '' : generateName();
+    colorPicker.value = status === 'modify' ? props?.color ?? '' : generateColor();
     createBtn.textContent = status === 'modify' ? 'update' : 'create';
   }
 
@@ -113,9 +99,7 @@ export class GarageView {
   }
 
   public removeStoredCar(carId: number): void {
-    this.cars = this.cars.filter(
-      (car) => car.controls.dataset.id !== carId.toString()
-    );
+    this.cars = this.cars.filter((car) => car.controls.dataset.id !== carId.toString());
   }
 
   public extractInputValues(): { name: string; color: string } {
@@ -142,9 +126,7 @@ export class GarageView {
   }
 
   public getCarElement(id: number): CarElement {
-    const element = this.cars.find(
-      (car) => car.controls.dataset.id === id.toString()
-    );
+    const element = this.cars.find((car) => car.controls.dataset.id === id.toString());
     if (element === undefined) throw new Error("can't find car element");
     return element;
   }

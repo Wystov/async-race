@@ -7,6 +7,9 @@ export class State {
     itemsPerPage: 7,
     totalItems: 0,
     raceMode: false,
+    get totalPages(): number {
+      return Math.ceil(this.totalItems / this.itemsPerPage);
+    },
   };
   public readonly winners: WinnersState = {
     currentPage: 1,
@@ -14,20 +17,19 @@ export class State {
     totalItems: 0,
     sortBy: 'wins',
     sortOrder: 'DESC',
+    get totalPages(): number {
+      return Math.ceil(this.totalItems / this.itemsPerPage);
+    },
   };
 
   public setCurrentPage(e: MouseEvent, view: 'garage' | 'winners'): void {
-    const { totalItems, currentPage, itemsPerPage } = this[view];
-    const pageNum = getNewPageNumber(e, totalItems, currentPage, itemsPerPage);
+    const { currentPage, totalPages } = this[view];
+    const pageNum = getNewPageNumber(e, currentPage, totalPages);
     if (pageNum !== undefined) this[view].currentPage = pageNum;
   }
 
-  public changeTotalItemsCount(
-    operation: 'add' | 'delete',
-    view: 'garage' | 'winners'
-  ): void {
-    this[view].totalItems =
-      operation === 'add' ? this[view].totalItems++ : this[view].totalItems--;
+  public changeTotalItemsCount(operation: 'add' | 'delete', view: 'garage' | 'winners'): void {
+    this[view].totalItems = operation === 'add' ? this[view].totalItems++ : this[view].totalItems--;
   }
 
   public handleEmptyPage(view: 'garage' | 'winners'): void {

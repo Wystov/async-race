@@ -11,13 +11,13 @@ export class WinnersView {
     this.winners = new SectionCreator(winnersElements, parent).getElements();
   }
 
-  public modifyElementsContent(winnersCount?: number, pageNum?: number): void {
+  public modifyElementsContent(winnersCount?: number, pageNum?: number, totalPages?: number): void {
     const { title, currentPage } = this.winners;
     if (winnersCount !== undefined) {
       title.textContent = `Winners (${winnersCount})`;
     }
-    if (pageNum !== undefined) {
-      currentPage.textContent = pageNum.toString();
+    if (pageNum !== undefined && totalPages !== undefined) {
+      currentPage.textContent = `${pageNum.toString()} / ${totalPages.toString()}`;
     }
   }
 
@@ -27,10 +27,7 @@ export class WinnersView {
 
   public createWinnerElement(winner: Winner, car: Car, digit: number): void {
     const { winnerElements } = this.winners;
-    const winnerElement = new SectionCreator(
-      winnersElement,
-      winnerElements
-    ).getElements();
+    const winnerElement = new SectionCreator(winnersElement, winnerElements).getElements();
     const { number, img, name, wins, time } = winnerElement;
     number.textContent = digit.toString();
     img.innerHTML = carImage;

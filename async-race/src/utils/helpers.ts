@@ -1,9 +1,9 @@
 /* eslint-disable consistent-return */
 import { carNames } from '../data/car-names';
 import { isButton, isHtmlElement } from './type-guards';
-import type { Car } from './types';
+import type { Car, ElementList } from './types';
 
-export const generateRandomName = (): string => {
+export const generateName = (): string => {
   const brands = Object.keys(carNames);
   const randomBrand = brands[Math.floor(Math.random() * brands.length)];
   const models = carNames[randomBrand];
@@ -11,7 +11,7 @@ export const generateRandomName = (): string => {
   return `${randomBrand} ${randomModel}`;
 };
 
-export const generateRandomColor = (): string => {
+export const generateColor = (): string => {
   let color = '';
   for (let i = 0; i < 3; i++) {
     color += Math.floor(Math.random() * 256).toString(16);
@@ -34,13 +34,11 @@ export const error = (e: Error): void => {
 
 export const getNewPageNumber = (
   e: MouseEvent,
-  totalCars: number,
   currentPage: number,
-  itemsPerPage: number
+  lastPage: number
 ): number | undefined => {
   if (!isHtmlElement(e.target)) return;
   const direction = e.target.classList[1].slice(-4).toLowerCase();
-  const totalPages = Math.ceil(totalCars / itemsPerPage);
   switch (direction) {
     case 'init':
       return 1;
@@ -48,15 +46,35 @@ export const getNewPageNumber = (
       if (currentPage === 1) return;
       return currentPage - 1;
     case 'next':
-      if (currentPage === totalPages || totalPages === 0) return;
+      if (currentPage === lastPage || lastPage === 0) return;
       return currentPage + 1;
     case 'last':
-      return totalPages > 0 ? totalPages : 1;
+      return lastPage > 0 ? lastPage : 1;
   }
 };
 
-export const toggleButtons = (btns: HTMLElement[]): void => {
+export const disableButtons = (btns: HTMLElement[], state: boolean): void => {
   btns.forEach((btn) => {
-    if (isButton(btn)) btn.disabled = !btn.disabled;
+    if (isButton(btn)) btn.disabled = state;
   });
+};
+
+export const togglePaginationButtons = (
+  currentPage: number,
+  lastPage: number,
+  view: ElementList
+): void => {
+  const { toFirstPage, toPrevPage, toNextPage, toLastPage } = view;
+  switch (true) {
+    case currentPage === 1:
+      disableButtons([toFirstPage, toPrevPage], true);
+      disableButtons([toNextPage, toLastPage], false);
+      break;
+    case currentPage > 1 && currentPage < lastPage:
+      disableButtons([toFirstPage, toPrevPage, toNextPage, toLastPage], false);
+      break;
+    case currentPage === lastPage:
+      disableButtons([toFirstPage, toPrevPage], false);
+      disableButtons([toNextPage, toLastPage], true);
+  }
 };

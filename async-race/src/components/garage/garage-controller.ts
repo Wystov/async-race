@@ -14,6 +14,8 @@ export class GarageController {
     this.view = new GarageView(parent);
     this.addListenersToPage();
     this.getCars();
+    const { currentPage, totalPages } = this.state.garage;
+    helpers.togglePaginationButtons(currentPage, totalPages, this.view.garage);
   }
 
   private getCars(): void {
@@ -43,8 +45,8 @@ export class GarageController {
         if (this.view.cars.length === 0) {
           this.state.handleEmptyPage('garage');
         }
-        const { totalItems, currentPage } = this.state.garage;
-        this.view.modifyElementsContent(totalItems, currentPage);
+        const { totalItems, currentPage, totalPages } = this.state.garage;
+        this.view.modifyElementsContent(totalItems, currentPage, totalPages);
         this.getCars();
       })
       .catch(helpers.error);
@@ -140,16 +142,17 @@ export class GarageController {
 
   private switchPage(e: MouseEvent): void {
     this.state.setCurrentPage(e, 'garage');
-    const { currentPage } = this.state.garage;
+    const { currentPage, totalPages } = this.state.garage;
+    helpers.togglePaginationButtons(currentPage, totalPages, this.view.garage);
     this.view.hideWinner();
-    this.view.modifyElementsContent(undefined, currentPage);
+    this.view.modifyElementsContent(undefined, currentPage, totalPages);
     this.getCars();
   }
 
   private fillGarage(response: CarsResponse): void {
     this.state.garage.totalItems = response.totalCount;
-    const { currentPage, totalItems } = this.state.garage;
-    this.view.modifyElementsContent(totalItems, currentPage);
+    const { currentPage, totalItems, totalPages } = this.state.garage;
+    this.view.modifyElementsContent(totalItems, currentPage, totalPages);
     this.view.cars.length = 0;
     const { cars } = response;
     this.view.clearCarsPage();
@@ -204,8 +207,8 @@ export class GarageController {
   private generateCars(): void {
     const CARS_AMOUNT = 100;
     for (let i = 0; i < CARS_AMOUNT; i++) {
-      const name = helpers.generateRandomName();
-      const color = helpers.generateRandomColor();
+      const name = helpers.generateName();
+      const color = helpers.generateColor();
       this.addCar(name, color);
     }
   }
