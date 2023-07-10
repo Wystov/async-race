@@ -57,3 +57,18 @@ export type BtnMethod = 'delete' | 'modify' | 'started' | 'stopped';
 export type SortBy = 'id' | 'wins' | 'time';
 
 export type SortOrder = 'ASC' | 'DESC';
+
+export interface GarageState {
+  currentPage: number;
+  itemsPerPage: number;
+  totalItems: number;
+  raceMode: boolean;
+}
+
+export interface WinnersState {
+  currentPage: number;
+  itemsPerPage: number;
+  totalItems: number;
+  sortBy: SortBy;
+  sortOrder: SortOrder;
+}

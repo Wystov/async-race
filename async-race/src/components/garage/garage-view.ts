@@ -1,5 +1,5 @@
 import type { Car, CarElement, ElementList } from '../../utils/types';
-import { isButton, isInput } from '../../utils/type-guards';
+import { isButton, isHtmlElement, isInput } from '../../utils/type-guards';
 import { SectionCreator } from '../../utils/section-creator';
 import { generateRandomName, generateRandomColor } from '../../utils/helpers';
 import { carImage } from '../../data/car-image';
@@ -173,7 +173,7 @@ export class GarageView {
 
   public hideWinner(): void {
     const { winnerPopup } = this.garage;
-    if (winnerPopup instanceof HTMLElement) {
+    if (isHtmlElement(winnerPopup)) {
       winnerPopup.remove();
       delete this.garage.winnerPopup;
     }

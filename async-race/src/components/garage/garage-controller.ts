@@ -5,23 +5,20 @@ import { APIHandler } from '../api-handler/api-handler';
 import { GarageView } from './garage-view';
 import * as helpers from '../../utils/helpers';
 import './car.scss';
+import type { State } from '../state/state';
 
 export class GarageController {
-  private currentPage = 1;
-  private readonly itemsPerPage = 7;
-  private totalCars = 0;
   private readonly view: GarageView;
-  private raceMode = false;
-  private winner: { id: number; time: number } | undefined;
 
-  constructor(parent: HTMLElement) {
+  constructor(parent: HTMLElement, private readonly state: State) {
     this.view = new GarageView(parent);
     this.addListenersToPage();
-    this.getCars(this.currentPage);
+    this.getCars();
   }
 
-  private getCars(page: number): void {
-    APIHandler.getCars(page)
+  private getCars(): void {
+    const { currentPage } = this.state.garage;
+    APIHandler.getCars(currentPage)
       .then((cars) => this.fillGarage(cars))
       .catch(helpers.error);
   }
@@ -30,8 +27,9 @@ export class GarageController {
     APIHandler.createCar({ name, color })
       .then((car) => {
         this.renderCarsToPageLimit(car);
-        this.totalCars += 1;
-        this.view.modifyElementsContent(this.totalCars);
+        this.state.changeTotalItemsCount('add', 'garage');
+        const { totalItems } = this.state.garage;
+        this.view.modifyElementsContent(totalItems);
         this.view.removeCarPopup();
         this.view.toggleCreateCarBtn();
       })
@@ -43,10 +41,11 @@ export class GarageController {
       .then((ok) => {
         if (!ok) throw new Error("can't delete car");
         if (this.view.cars.length === 0) {
-          this.currentPage = this.currentPage > 1 ? this.currentPage - 1 : 1;
+          this.state.handleEmptyPage('garage');
         }
-        this.view.modifyElementsContent(this.totalCars, this.currentPage);
-        this.getCars(this.currentPage);
+        const { totalItems, currentPage } = this.state.garage;
+        this.view.modifyElementsContent(totalItems, currentPage);
+        this.getCars();
       })
       .catch(helpers.error);
     APIHandler.deleteWinner(id).catch(helpers.error);
@@ -81,14 +80,13 @@ export class GarageController {
   private toDriveMode(id: number, animation: Animation, time: number): void {
     APIHandler.driveMode(id)
       .then((response) => {
+        const { raceMode } = this.state.garage;
         if (response !== 'success') {
           animation.pause();
           console.warn(response);
-        } else if (this.raceMode && this.winner === undefined) {
-          this.winner = { id, time };
+        } else if (raceMode) {
           this.handleWinner(id, time);
-          this.raceMode = false;
-          this.winner = undefined;
+          this.state.toggleRaceMode();
         }
       })
       .catch(helpers.error);
@@ -131,30 +129,27 @@ export class GarageController {
     paginationBtns.addEventListener('click', this.switchPage.bind(this));
     const { startBtn, resetBtn } = this.view.raceControls;
     startBtn.addEventListener('click', () => {
-      this.raceMode = true;
+      this.state.toggleRaceMode();
       this.toggleRace('started');
     });
     resetBtn.addEventListener('click', () => {
-      this.raceMode = false;
       this.view.hideWinner();
       this.toggleRace('stopped');
     });
   }
 
   private switchPage(e: MouseEvent): void {
-    const { currentPage, totalCars } = this;
-    this.currentPage =
-      helpers.getNewPageNumber(e, totalCars, currentPage, this.itemsPerPage) ??
-      currentPage;
-    console.log(this.currentPage);
+    this.state.setCurrentPage(e, 'garage');
+    const { currentPage } = this.state.garage;
     this.view.hideWinner();
-    this.view.modifyElementsContent(undefined, this.currentPage);
-    this.getCars(this.currentPage);
+    this.view.modifyElementsContent(undefined, currentPage);
+    this.getCars();
   }
 
   private fillGarage(response: CarsResponse): void {
-    this.totalCars = response.totalCount;
-    this.view.modifyElementsContent(this.totalCars, this.currentPage);
+    this.state.garage.totalItems = response.totalCount;
+    const { currentPage, totalItems } = this.state.garage;
+    this.view.modifyElementsContent(totalItems, currentPage);
     this.view.cars.length = 0;
     const { cars } = response;
     this.view.clearCarsPage();

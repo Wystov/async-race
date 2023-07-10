@@ -1,6 +1,6 @@
 /* eslint-disable consistent-return */
 import { carNames } from '../data/car-names';
-import { isHtmlElement } from './type-guards';
+import { isButton, isHtmlElement } from './type-guards';
 import type { Car } from './types';
 
 export const generateRandomName = (): string => {
@@ -53,4 +53,10 @@ export const getNewPageNumber = (
     case 'last':
       return totalPages > 0 ? totalPages : 1;
   }
+};
+
+export const toggleButtons = (btns: HTMLElement[]): void => {
+  btns.forEach((btn) => {
+    if (isButton(btn)) btn.disabled = !btn.disabled;
+  });
 };

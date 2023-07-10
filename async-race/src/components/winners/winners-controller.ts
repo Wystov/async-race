@@ -2,41 +2,35 @@ import { WinnersView } from './winners-view';
 import './winners.scss';
 import * as helpers from '../../utils/helpers';
 import { APIHandler } from '../api-handler/api-handler';
-import type { SortBy, SortOrder, WinnersResponse } from '../../utils/types';
+import type { WinnersResponse } from '../../utils/types';
+import type { State } from '../state/state';
 
 export class WinnersController {
-  private currentPage = 1;
-  private readonly itemsPerPage = 10;
-  private totalWinners = 0;
-  private sortBy: SortBy = 'wins';
-  private sortOrder: SortOrder = 'DESC';
   private readonly view: WinnersView;
 
-  constructor(parent: HTMLElement) {
+  constructor(parent: HTMLElement, private readonly state: State) {
     this.view = new WinnersView(parent);
     this.addListeners();
-    this.getWinners(this.currentPage, this.sortBy, this.sortOrder);
+    this.getWinners();
   }
 
-  private getWinners(
-    page: number = this.currentPage,
-    sortBy: SortBy = this.sortBy,
-    order: SortOrder = this.sortOrder
-  ): void {
-    APIHandler.getWinners(page, sortBy, order)
+  private getWinners(): void {
+    const { currentPage, sortBy, sortOrder } = this.state.winners;
+    APIHandler.getWinners(currentPage, sortBy, sortOrder)
       .then(async (winners) => this.fillWinners(winners))
       .catch(helpers.error);
   }
 
   private async fillWinners(response: WinnersResponse): Promise<void> {
-    this.totalWinners = response.totalCount;
-    this.view.modifyElementsContent(this.totalWinners, this.currentPage);
+    this.state.winners.totalItems = response.totalCount;
+    const { totalItems, currentPage } = this.state.winners;
+    this.view.modifyElementsContent(totalItems, currentPage);
     this.view.clearWinnersPage();
     const { winners } = response;
     winners.forEach((winner, i) => {
       APIHandler.getCar(winner.id)
         .then((car) => {
-          const number = this.currentPage * 10 - 9 + i;
+          const number = currentPage * 10 - 9 + i;
           this.view.createWinnerElement(winner, car, number);
         })
         .catch(helpers.error);
@@ -45,29 +39,20 @@ export class WinnersController {
 
   private addListeners(): void {
     const { time, wins, paginationBtns } = this.view.winners;
-    time.addEventListener('click', () => {
-      this.sortBy = 'time';
-      this.sortOrder = this.sortOrder === 'DESC' ? 'ASC' : 'DESC';
-      this.getWinners(this.currentPage, this.sortBy, this.sortOrder);
-    });
-    wins.addEventListener('click', () => {
-      this.sortBy = 'wins';
-      this.sortOrder = this.sortOrder === 'DESC' ? 'ASC' : 'DESC';
-      this.getWinners(this.currentPage, this.sortBy, this.sortOrder);
-    });
+    time.addEventListener('click', () => this.handleSortClick('time'));
+    wins.addEventListener('click', () => this.handleSortClick('wins'));
     paginationBtns.addEventListener('click', this.switchPage.bind(this));
   }
 
+  private handleSortClick(by: 'time' | 'wins'): void {
+    this.state.handleSort(by);
+    this.getWinners();
+  }
+
   private switchPage(e: MouseEvent): void {
-    const { currentPage, totalWinners } = this;
-    this.currentPage =
-      helpers.getNewPageNumber(
-        e,
-        totalWinners,
-        currentPage,
-        this.itemsPerPage
-      ) ?? currentPage;
-    this.view.modifyElementsContent(undefined, this.currentPage);
+    this.state.setCurrentPage(e, 'winners');
+    const { currentPage } = this.state.winners;
+    this.view.modifyElementsContent(undefined, currentPage);
     this.getWinners();
   }
 }
