@@ -1,7 +1,7 @@
-import type { Car, CarElement, ElementList } from '../../utils/types';
+import type { Car, CarElement, ContentDefaultParams, ElementList } from '../../utils/types';
 import { isButton, isHtmlElement, isInput } from '../../utils/type-guards';
 import { SectionCreator } from '../../utils/section-creator';
-import { generateName, generateColor } from '../../utils/helpers';
+import { generateName, generateColor, error } from '../../utils/helpers';
 import { carImage } from '../../data/car-image';
 import { carElementsData } from '../../data/page-elements.ts/garage/car-element';
 import { createCarPopupData } from '../../data/page-elements.ts/garage/create-car-popup-element';
@@ -37,13 +37,17 @@ export class GarageView {
     return carElement;
   }
 
-  public modifyElementsContent(carsCount?: number, pageNum?: number, totalPages?: number): void {
-    const { title, currentPage } = this.garage;
-    if (carsCount !== undefined) {
-      title.textContent = `Garage (${carsCount})`;
+  public modifyElementsContent({
+    totalItems,
+    currentPage,
+    totalPages,
+  }: ContentDefaultParams = {}): void {
+    const { title, currentPageEl } = this.garage;
+    if (totalItems !== undefined) {
+      title.textContent = `Garage (${totalItems})`;
     }
-    if (pageNum !== undefined && totalPages !== undefined) {
-      currentPage.textContent = `${pageNum.toString()} / ${totalPages.toString()}`;
+    if (currentPage !== undefined && totalPages !== undefined) {
+      currentPageEl.textContent = `${currentPage.toString()} / ${totalPages.toString()}`;
     }
   }
 
@@ -62,13 +66,13 @@ export class GarageView {
     this.createCarPopup.createBtn.addEventListener('click', callback);
   }
 
-  public showModifyCar(data: Car, callback: (id: number) => void): void {
+  public showModifyCar(data: Car, callback: (id: number) => Promise<void>): void {
     if (this.createCarPopup.container !== undefined) return;
     const { id, name, color } = data;
     const carElement = this.getCarElement(id ?? 0);
     if (carElement === undefined) return;
     this.showCreateCar(carElement.container, () => {
-      callback(id ?? 0);
+      callback(id ?? 0).catch(error);
     });
     this.changeCarPopupValues('modify', { name, color });
   }

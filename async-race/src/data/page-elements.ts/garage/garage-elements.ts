@@ -64,7 +64,7 @@ export const garageElements = [
     },
   },
   {
-    key: 'currentPage',
+    key: 'currentPageEl',
     value: {
       classes: ['button', 'pagination__current'],
       parent: 'paginationBtns',

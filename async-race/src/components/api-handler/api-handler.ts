@@ -30,11 +30,16 @@ export class APIHandler {
     return response;
   }
 
-  public static async deleteCar(id: number): Promise<boolean> {
-    const request = await fetch(`${this.baseUrl}/garage/${id}`, {
-      method: 'DELETE',
-    });
-    return request.ok;
+  public static async deleteCar(id: number): Promise<Response | undefined> {
+    try {
+      const response = await fetch(`${this.baseUrl}/garage/${id}`, {
+        method: 'DELETE',
+      });
+      return response;
+    } catch (err) {
+      console.warn(err);
+      return undefined;
+    }
   }
 
   public static async updateCar(id: number, car: Car): Promise<boolean> {
@@ -95,7 +100,11 @@ export class APIHandler {
   }
 
   public static async deleteWinner(id: number): Promise<void> {
-    await fetch(`${this.baseUrl}/winners/${id}`, { method: 'DELETE' });
+    try {
+      await fetch(`${this.baseUrl}/winners/${id}`, { method: 'DELETE' });
+    } catch (err) {
+      console.warn(err);
+    }
   }
 
   public static async updateWinner(id: number, newResult: Omit<Winner, 'id'>): Promise<void> {

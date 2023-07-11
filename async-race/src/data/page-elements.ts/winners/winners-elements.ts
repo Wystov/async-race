@@ -39,7 +39,7 @@ export const winnersElements = [
     },
   },
   {
-    key: 'currentPage',
+    key: 'currentPageEl',
     value: {
       classes: ['button', 'pagination__current'],
       parent: 'paginationBtns',

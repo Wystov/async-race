@@ -73,3 +73,9 @@ export interface WinnersState {
   sortOrder: SortOrder;
   totalPages: number;
 }
+
+export interface ContentDefaultParams {
+  totalItems?: number;
+  currentPage?: number;
+  totalPages?: number;
+}

@@ -2,7 +2,6 @@ import { WinnersView } from './winners-view';
 import './winners.scss';
 import * as helpers from '../../utils/helpers';
 import { APIHandler } from '../api-handler/api-handler';
-import type { WinnersResponse } from '../../utils/types';
 import type { State } from '../state/state';
 
 export class WinnersController {
@@ -10,33 +9,29 @@ export class WinnersController {
 
   constructor(parent: HTMLElement, private readonly state: State) {
     this.view = new WinnersView(parent);
+    this.init().catch(helpers.error);
+  }
+
+  private async init(): Promise<void> {
     this.addListeners();
-    this.getWinners();
+    await this.fillWinners();
     const { currentPage, totalPages } = this.state.winners;
     helpers.togglePaginationButtons(currentPage, totalPages, this.view.winners);
   }
 
-  private getWinners(): void {
+  private async fillWinners(): Promise<void> {
     const { currentPage, sortBy, sortOrder } = this.state.winners;
-    APIHandler.getWinners(currentPage, sortBy, sortOrder)
-      .then(async (winners) => this.fillWinners(winners))
-      .catch(helpers.error);
-  }
-
-  private async fillWinners(response: WinnersResponse): Promise<void> {
-    this.state.winners.totalItems = response.totalCount;
-    const { totalItems, currentPage, totalPages } = this.state.winners;
-    this.view.modifyElementsContent(totalItems, currentPage, totalPages);
+    const { winners, totalCount } = await APIHandler.getWinners(currentPage, sortBy, sortOrder);
+    this.state.winners.totalItems = totalCount;
+    const { totalItems, totalPages } = this.state.winners;
+    this.view.modifyElementsContent({ totalItems, currentPage, totalPages });
     this.view.clearWinnersPage();
-    const { winners } = response;
-    winners.forEach((winner, i) => {
-      APIHandler.getCar(winner.id)
-        .then((car) => {
-          const number = currentPage * 10 - 9 + i;
-          this.view.createWinnerElement(winner, car, number);
-        })
-        .catch(helpers.error);
+    const winnerPromises = winners.map(async (winner, i) => {
+      const car = await APIHandler.getCar(winner.id);
+      const number = currentPage * 10 - 9 + i;
+      this.view.createWinnerElement(winner, car, number);
     });
+    await Promise.allSettled(winnerPromises);
   }
 
   private addListeners(): void {
@@ -48,14 +43,14 @@ export class WinnersController {
 
   private handleSortClick(by: 'time' | 'wins'): void {
     this.state.handleSort(by);
-    this.getWinners();
+    this.fillWinners().catch(helpers.error);
   }
 
   private switchPage(e: MouseEvent): void {
     this.state.setCurrentPage(e, 'winners');
     const { currentPage, totalPages } = this.state.winners;
     helpers.togglePaginationButtons(currentPage, totalPages, this.view.winners);
-    this.view.modifyElementsContent(undefined, currentPage, totalPages);
-    this.getWinners();
+    this.view.modifyElementsContent({ currentPage, totalPages });
+    this.fillWinners().catch(helpers.error);
   }
 }

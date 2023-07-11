@@ -66,6 +66,9 @@ export const togglePaginationButtons = (
 ): void => {
   const { toFirstPage, toPrevPage, toNextPage, toLastPage } = view;
   switch (true) {
+    case currentPage === 1 && lastPage === 1:
+      disableButtons([toFirstPage, toPrevPage, toNextPage, toLastPage], true);
+      break;
     case currentPage === 1:
       disableButtons([toFirstPage, toPrevPage], true);
       disableButtons([toNextPage, toLastPage], false);

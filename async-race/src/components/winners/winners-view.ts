@@ -2,7 +2,7 @@ import { carImage } from '../../data/car-image';
 import { winnersElement } from '../../data/page-elements.ts/winners/winner-elements';
 import { winnersElements } from '../../data/page-elements.ts/winners/winners-elements';
 import { SectionCreator } from '../../utils/section-creator';
-import type { Car, ElementList, Winner } from '../../utils/types';
+import type { Car, ContentDefaultParams, ElementList, Winner } from '../../utils/types';
 
 export class WinnersView {
   public winners: ElementList = {};
@@ -11,13 +11,17 @@ export class WinnersView {
     this.winners = new SectionCreator(winnersElements, parent).getElements();
   }
 
-  public modifyElementsContent(winnersCount?: number, pageNum?: number, totalPages?: number): void {
-    const { title, currentPage } = this.winners;
-    if (winnersCount !== undefined) {
-      title.textContent = `Winners (${winnersCount})`;
+  public modifyElementsContent({
+    totalItems,
+    currentPage,
+    totalPages,
+  }: ContentDefaultParams = {}): void {
+    const { title, currentPageEl } = this.winners;
+    if (totalItems !== undefined) {
+      title.textContent = `Winners (${totalItems})`;
     }
-    if (pageNum !== undefined && totalPages !== undefined) {
-      currentPage.textContent = `${pageNum.toString()} / ${totalPages.toString()}`;
+    if (currentPage !== undefined && totalPages !== undefined) {
+      currentPageEl.textContent = `${currentPage.toString()} / ${totalPages.toString()}`;
     }
   }
 
