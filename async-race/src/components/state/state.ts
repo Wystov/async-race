@@ -6,7 +6,6 @@ export class State {
     currentPage: 1,
     itemsPerPage: 7,
     totalItems: 0,
-    raceMode: false,
     get totalPages(): number {
       return Math.ceil(this.totalItems / this.itemsPerPage);
     },
@@ -35,10 +34,6 @@ export class State {
   public handleEmptyPage(view: 'garage' | 'winners'): void {
     const { currentPage } = this[view];
     this[view].currentPage = currentPage > 1 ? currentPage - 1 : 1;
-  }
-
-  public toggleRaceMode(): void {
-    this.garage.raceMode = !this.garage.raceMode;
   }
 
   public handleSort(sort: SortBy): void {

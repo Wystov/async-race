@@ -62,7 +62,6 @@ export interface GarageState {
   currentPage: number;
   itemsPerPage: number;
   totalItems: number;
-  raceMode: boolean;
   totalPages: number;
 }
 

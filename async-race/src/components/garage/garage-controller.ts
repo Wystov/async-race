@@ -1,5 +1,5 @@
 // eslint-disable-next-line prettier/prettier
-import type { BtnEl, BtnMethod, Car, CarElement, CarsResponse, Engine } from '../../utils/types';
+import type { BtnEl, BtnMethod, Car, CarElement, CarsResponse, Engine, Winner } from '../../utils/types';
 import { isButton } from '../../utils/type-guards';
 import { APIHandler } from '../api-handler/api-handler';
 import { GarageView } from './garage-view';
@@ -9,9 +9,11 @@ import type { State } from '../state/state';
 
 export class GarageController {
   private readonly view: GarageView;
+  private readonly racePromises: Array<Promise<Omit<Winner, 'wins'>>> = [];
 
   constructor(parent: HTMLElement, private readonly state: State) {
     this.view = new GarageView(parent);
+    console.log(this);
     this.addListenersToPage();
     this.getCars();
     const { currentPage, totalPages } = this.state.garage;
@@ -57,13 +59,14 @@ export class GarageController {
       .catch(helpers.error);
   }
 
-  private toggleEngine(id: number, command: Engine, car: CarElement): void {
-    APIHandler.toggleEngine(id, command)
+  private async toggleEngine(id: number, command: Engine, car: CarElement): Promise<void> {
+    return APIHandler.toggleEngine(id, command)
       .then(({ velocity, distance }) => {
         if (velocity > 0) {
           const animationTime = Math.round(distance / velocity);
           car.animation = this.view.moveCar(animationTime, car.image);
-          this.toDriveMode(id, car.animation, animationTime);
+          const promise = this.toDriveMode(id, car.animation, animationTime);
+          this.racePromises.push(promise);
         } else {
           car.animation?.cancel();
           delete car.animation;
@@ -72,19 +75,25 @@ export class GarageController {
       .catch(helpers.error);
   }
 
-  private toDriveMode(id: number, animation: Animation, time: number): void {
-    APIHandler.driveMode(id)
-      .then((response) => {
-        const { raceMode } = this.state.garage;
-        if (response !== 'success') {
+  private async toDriveMode(
+    id: number,
+    animation: Animation,
+    time: number
+  ): Promise<Omit<Winner, 'wins'>> {
+    return new Promise((resolve) => {
+      APIHandler.driveMode(id)
+        .then((response) => {
+          if (response === 'success') {
+            resolve({ id, time });
+          } else if (response !== 'success') {
+            throw new Error(response);
+          }
+        })
+        .catch((err) => {
           animation.pause();
-          console.warn(response);
-        } else if (raceMode) {
-          this.handleWinner(id, time);
-          this.state.toggleRaceMode();
-        }
-      })
-      .catch(helpers.error);
+          console.warn(err.message);
+        });
+    });
   }
 
   private handleWinner(id: number, time: number): void {
@@ -124,12 +133,13 @@ export class GarageController {
     paginationBtns.addEventListener('click', this.switchPage.bind(this));
     const { startBtn, resetBtn } = this.view.raceControls;
     startBtn.addEventListener('click', () => {
-      this.state.toggleRaceMode();
+      helpers.disableButtons([startBtn, resetBtn], true);
       this.toggleRace('started');
     });
     resetBtn.addEventListener('click', () => {
       this.view.hideWinner();
       this.toggleRace('stopped');
+      helpers.disableButtons([resetBtn], true);
     });
   }
 
@@ -205,7 +215,7 @@ export class GarageController {
       case 'started':
       case 'stopped':
         if (buttons !== undefined) this.view.toggleEngineBtns(...buttons);
-        this.toggleEngine(data.id ?? 0, todo, carElement);
+        this.toggleEngine(data.id ?? 0, todo, carElement).catch(helpers.error);
     }
   }
 
@@ -219,9 +229,28 @@ export class GarageController {
   }
 
   private toggleRace(method: 'started' | 'stopped'): void {
+    const promises: Array<Promise<void>> = [];
     this.view.cars.forEach((car) => {
       const id = car.controls.dataset.id ?? 0;
-      this.toggleEngine(+id, method, car);
+      const promise = this.toggleEngine(+id, method, car);
+      promises.push(promise);
     });
+    Promise.all(promises)
+      .then(() => {
+        if (method === 'stopped') {
+          const { startBtn } = this.view.raceControls;
+          helpers.disableButtons([startBtn], false);
+        } else if (this.racePromises.length > 0) {
+          Promise.any(this.racePromises)
+            .then(({ id, time }) => {
+              this.racePromises.length = 0;
+              this.handleWinner(id, time);
+              const { resetBtn } = this.view.raceControls;
+              helpers.disableButtons([resetBtn], false);
+            })
+            .catch(helpers.error);
+        }
+      })
+      .catch(helpers.error);
   }
 }
