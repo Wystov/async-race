@@ -27,14 +27,7 @@ export class GarageController {
 
   private addCar(name: string, color: string): void {
     APIHandler.createCar({ name, color })
-      .then((car) => {
-        this.renderCarsToPageLimit(car);
-        this.state.changeTotalItemsCount('add', 'garage');
-        const { totalItems } = this.state.garage;
-        this.view.modifyElementsContent(totalItems);
-        this.view.removeCarPopup();
-        this.view.toggleCreateCarBtn();
-      })
+      .then((car) => this.handleCarAdd(car))
       .catch(helpers.error);
   }
 
@@ -138,6 +131,18 @@ export class GarageController {
       this.view.hideWinner();
       this.toggleRace('stopped');
     });
+  }
+
+  private handleCarAdd(car: Car): void {
+    this.renderCarsToPageLimit(car);
+    const prevTotalPages = this.state.garage.totalPages;
+    this.state.changeTotalItemsCount('add', 'garage');
+    const { totalItems, currentPage, totalPages } = this.state.garage;
+    this.view.modifyElementsContent(totalItems, currentPage, totalPages);
+    if (prevTotalPages !== totalPages) {
+      helpers.togglePaginationButtons(currentPage, totalPages, this.view.garage);
+    }
+    this.view.removeCarPopup();
   }
 
   private switchPage(e: MouseEvent): void {

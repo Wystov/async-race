@@ -29,7 +29,7 @@ export class State {
   }
 
   public changeTotalItemsCount(operation: 'add' | 'delete', view: 'garage' | 'winners'): void {
-    this[view].totalItems = operation === 'add' ? this[view].totalItems++ : this[view].totalItems--;
+    this[view].totalItems = operation === 'add' ? ++this[view].totalItems : --this[view].totalItems;
   }
 
   public handleEmptyPage(view: 'garage' | 'winners'): void {

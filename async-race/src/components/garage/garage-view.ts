@@ -57,7 +57,6 @@ export class GarageView {
   }
 
   public showCreateCar(parent: HTMLElement, callback: () => void): void {
-    this.toggleCreateCarBtn();
     this.createCarPopup = new SectionCreator(createCarPopupData, parent).getElements();
     this.changeCarPopupValues('create');
     this.createCarPopup.createBtn.addEventListener('click', callback);
@@ -83,11 +82,6 @@ export class GarageView {
     nameInput.value = status === 'modify' ? props?.name ?? '' : generateName();
     colorPicker.value = status === 'modify' ? props?.color ?? '' : generateColor();
     createBtn.textContent = status === 'modify' ? 'update' : 'create';
-  }
-
-  public toggleCreateCarBtn(): void {
-    const { createCarBtn } = this.garage;
-    if (isButton(createCarBtn)) createCarBtn.disabled = !createCarBtn.disabled;
   }
 
   public removeCarPopup(): void {
