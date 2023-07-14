@@ -6,6 +6,7 @@ export class State {
     currentPage: 1,
     itemsPerPage: 7,
     totalItems: 0,
+    carsAtStart: 7,
     get totalPages(): number {
       return Math.ceil(this.totalItems / this.itemsPerPage);
     },

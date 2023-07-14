@@ -50,8 +50,6 @@ export interface Winner {
 
 export type UpdateWinner = Omit<Winner, 'id'>;
 
-export type BtnEl = [HTMLButtonElement, HTMLButtonElement];
-
 export type BtnMethod = 'delete' | 'modify' | 'started' | 'stopped';
 
 export type SortBy = 'id' | 'wins' | 'time';
@@ -63,6 +61,7 @@ export interface GarageState {
   itemsPerPage: number;
   totalItems: number;
   totalPages: number;
+  carsAtStart: number;
 }
 
 export interface WinnersState {

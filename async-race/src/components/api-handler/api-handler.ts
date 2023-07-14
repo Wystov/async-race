@@ -60,14 +60,21 @@ export class APIHandler {
     return carParams;
   }
 
-  public static async driveMode(id: number): Promise<string> {
-    const queryParams = `?id=${id}&status=drive`;
-    const response = await fetch(`${this.baseUrl}/engine/${queryParams}`, {
-      method: 'PATCH',
-    });
-    if (response.ok) return 'success';
-    const error = await response.text();
-    return error;
+  public static async driveMode(id: number): Promise<string | Response | undefined> {
+    try {
+      const queryParams = `?id=${id}&status=drive`;
+      const response = await fetch(`${this.baseUrl}/engine/${queryParams}`, {
+        method: 'PATCH',
+      });
+      if (response.ok) return 'success';
+      if (response.status === 404) {
+        throw new Error('404');
+      }
+      return response;
+    } catch {
+      console.log('catching stale engine break');
+      return undefined;
+    }
   }
 
   public static async getWinners(

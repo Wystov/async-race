@@ -1,5 +1,5 @@
 // eslint-disable-next-line prettier/prettier
-import type { BtnEl, BtnMethod, Car, CarElement, Engine, Winner } from '../../utils/types';
+import type { BtnMethod, Car, CarElement, Engine, Winner } from '../../utils/types';
 import { isButton } from '../../utils/type-guards';
 import { APIHandler } from '../api-handler/api-handler';
 import { GarageView } from './garage-view';
@@ -9,7 +9,8 @@ import type { State } from '../state/state';
 
 export class GarageController {
   private readonly view: GarageView;
-  private readonly racePromises: Array<Promise<Omit<Winner, 'wins'>>> = [];
+  private raceMode = false;
+  private readonly racePromises: Array<Promise<Omit<Winner, 'wins'> | undefined>> = [];
 
   constructor(parent: HTMLElement, private readonly state: State) {
     this.view = new GarageView(parent);
@@ -51,13 +52,26 @@ export class GarageController {
 
   private async toggleEngine(id: number, command: Engine, car: CarElement): Promise<void> {
     try {
+      if (command === 'started') this.view.toggleCarBtns(car, command);
+      if (command === 'stopped') this.view.toggleStopBtn(car);
+      if (!this.raceMode) {
+        const { startBtn, resetBtn } = this.view.raceControls;
+        if (isButton(startBtn)) startBtn.disabled = true;
+        if (isButton(resetBtn)) resetBtn.disabled = false;
+      }
       const { velocity, distance } = await APIHandler.toggleEngine(id, command);
+      if (command === 'stopped') this.view.toggleCarBtns(car, command);
+      this.view.toggleStopBtn(car);
       if (velocity === 0) throw new Error('engine stopped');
+      --this.state.garage.carsAtStart;
       const animationTime = Math.round(distance / velocity);
       car.animation = this.view.moveCar(animationTime, car.image);
       const promise = this.toDriveMode(id, car.animation, animationTime);
       this.racePromises.push(promise);
     } catch (err) {
+      ++this.state.garage.carsAtStart;
+      if (this.state.garage.carsAtStart === 7) this.view.switchRaceBtns();
+      if (!this.raceMode) this.racePromises.length = 0;
       car.animation?.cancel();
       delete car.animation;
     }
@@ -67,15 +81,22 @@ export class GarageController {
     id: number,
     animation: Animation,
     time: number
-  ): Promise<Omit<Winner, 'wins'>> {
+  ): Promise<Omit<Winner, 'wins'> | undefined> {
     try {
       const response = await APIHandler.driveMode(id);
-      if (response !== 'success') throw new Error(response);
-      return { id, time };
+      if (typeof response === 'string') return { id, time };
+      if (response === undefined) throw new Error();
+      const { status } = response;
+      const errorMessage = await response.text();
+      if (status === 404) throw new Error('404');
+      if (status === 500) throw new Error(errorMessage);
+      return undefined;
     } catch (err) {
+      if ((err as Error).message === '404') return undefined;
       animation.pause();
       console.warn((err as Error).message);
-      throw new Error('engine stopped');
+      if (this.raceMode) throw new Error('engine stopped');
+      return undefined;
     }
   }
 
@@ -95,6 +116,7 @@ export class GarageController {
       await APIHandler.updateWinner(id, { time, wins });
     } catch (error) {
       if ((error as Error).message === 'no record') {
+        console.warn('This car wins first time, creating new record');
         await APIHandler.createWinner({ id, wins: 1, time: newTime });
       }
     }
@@ -145,7 +167,8 @@ export class GarageController {
   }
 
   private renderCarsToPageLimit(car: Car): void {
-    if (this.view.cars.length < 7) {
+    const { itemsPerPage } = this.state.garage;
+    if (this.view.cars.length < itemsPerPage) {
       const carElement = this.view.createCarElement(car);
       this.addListenersToCar(carElement);
       this.view.cars.push(carElement);
@@ -165,14 +188,14 @@ export class GarageController {
       this.handleCarBtn(e, 'modify');
     });
     startEngineBtn.addEventListener('click', (e) => {
-      this.handleCarBtn(e, 'started', [startEngineBtn, stopEngineBtn]);
+      this.handleCarBtn(e, 'started');
     });
     stopEngineBtn.addEventListener('click', (e) => {
-      this.handleCarBtn(e, 'stopped', [startEngineBtn, stopEngineBtn]);
+      this.handleCarBtn(e, 'stopped');
     });
   }
 
-  private handleCarBtn(e: MouseEvent, todo: BtnMethod, buttons?: BtnEl): void {
+  private handleCarBtn(e: MouseEvent, todo: BtnMethod): void {
     const data = helpers.extractCarData(e);
     const carElement = this.view.getCarElement(data.id ?? 0);
     switch (todo) {
@@ -184,7 +207,6 @@ export class GarageController {
         break;
       case 'started':
       case 'stopped':
-        if (buttons !== undefined) this.view.toggleEngineBtns(...buttons);
         this.toggleEngine(data.id ?? 0, todo, carElement).catch(helpers.error);
     }
   }
@@ -199,6 +221,7 @@ export class GarageController {
   }
 
   private async toggleRace(method: 'started' | 'stopped'): Promise<void> {
+    this.raceMode = true;
     const enginePromises: Array<Promise<void>> = [];
     this.view.cars.forEach((car) => {
       const id = car.controls.dataset.id ?? 0;
@@ -215,11 +238,14 @@ export class GarageController {
 
   private handleRaceReset(): void {
     const { startBtn } = this.view.raceControls;
+    this.raceMode = false;
     helpers.disableButtons([startBtn], false);
   }
 
   private async handleRaceWinner(): Promise<void> {
-    const { id, time } = await Promise.any(this.racePromises);
+    const winner = await Promise.any(this.racePromises);
+    if (winner === undefined) return;
+    const { id, time } = winner;
     this.racePromises.length = 0;
     this.handleWinner(id, time).catch(helpers.error);
     const { resetBtn } = this.view.raceControls;

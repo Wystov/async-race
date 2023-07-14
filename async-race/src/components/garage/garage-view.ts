@@ -1,7 +1,7 @@
-import type { Car, CarElement, ContentDefaultParams, ElementList } from '../../utils/types';
+import type { Car, CarElement, ContentDefaultParams, ElementList, Engine } from '../../utils/types';
 import { isButton, isHtmlElement, isInput } from '../../utils/type-guards';
 import { SectionCreator } from '../../utils/section-creator';
-import { generateName, generateColor, error } from '../../utils/helpers';
+import { generateName, generateColor, error, disableButtons } from '../../utils/helpers';
 import { carImage } from '../../data/car-image';
 import { carElementsData } from '../../data/page-elements.ts/garage/car-element';
 import { createCarPopupData } from '../../data/page-elements.ts/garage/create-car-popup-element';
@@ -22,6 +22,7 @@ export class GarageView {
   private init(parent: HTMLElement): void {
     this.raceControls = new SectionCreator(raceControlElements, parent).getElements();
     this.garage = new SectionCreator(garageElements, parent).getElements();
+    this.switchRaceBtns();
   }
 
   public createCarElement(car: Car): CarElement {
@@ -51,9 +52,28 @@ export class GarageView {
     }
   }
 
-  public toggleEngineBtns(start: HTMLButtonElement, stop: HTMLButtonElement): void {
-    start.disabled = !start.disabled;
-    stop.disabled = !stop.disabled;
+  public switchRaceBtns(): void {
+    const { startBtn, resetBtn } = this.raceControls;
+    disableButtons([resetBtn], true);
+    disableButtons([startBtn], false);
+  }
+
+  public toggleCarBtns(car: CarElement, command: Engine): void {
+    const { startEngineBtn, stopEngineBtn, modifyBtn, deleteBtn } = car;
+    [startEngineBtn, stopEngineBtn, modifyBtn, deleteBtn].forEach((btn) => {
+      if (!isButton(btn)) return;
+      if (command === 'started') {
+        btn.disabled = true;
+      } else {
+        btn.disabled = false;
+      }
+    });
+  }
+
+  public toggleStopBtn(car: CarElement): void {
+    const { stopEngineBtn } = car;
+    if (!isButton(stopEngineBtn)) return;
+    stopEngineBtn.disabled = !stopEngineBtn.disabled;
   }
 
   public clearCarsPage(): void {
