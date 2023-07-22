@@ -49,10 +49,11 @@
 
 .pagination {
   display: flex;
+  width: fit-content;
   justify-content: center;
   align-items: center;
   gap: 5px;
-  margin: 20px 0 40px;
+  margin: 20px auto 40px;
 
   &__current {
     margin: 0 10px;

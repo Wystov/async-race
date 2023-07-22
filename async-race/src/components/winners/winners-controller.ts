@@ -48,6 +48,7 @@ export class WinnersController {
   }
 
   private switchPage(e: MouseEvent): void {
+    if (!(e.target instanceof HTMLButtonElement)) return;
     this.state.setCurrentPage(e, 'winners');
     const { currentPage, totalPages } = this.state.winners;
     helpers.togglePaginationButtons(currentPage, totalPages, this.view.winners);

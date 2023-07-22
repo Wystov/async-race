@@ -149,6 +149,7 @@ export class GarageController {
   }
 
   private switchPage(e: MouseEvent): void {
+    if (!(e.target instanceof HTMLButtonElement)) return;
     this.state.setCurrentPage(e, 'garage');
     const { currentPage, totalPages } = this.state.garage;
     helpers.togglePaginationButtons(currentPage, totalPages, this.view.garage);
