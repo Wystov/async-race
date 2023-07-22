@@ -24,8 +24,11 @@ export const garageElements = [
     key: 'createCarBtn',
     value: {
       tagName: 'button',
-      classes: ['button--create-car'],
-      textContent: 'create car',
+      classes: ['controls__button', 'controls__button--create-car'],
+      textContent: '+1',
+      attributes: {
+        title: 'Add car',
+      },
       parent: 'controls',
     },
   },
@@ -33,8 +36,35 @@ export const garageElements = [
     key: 'generateCarsBtn',
     value: {
       tagName: 'button',
-      classes: ['button--generate-cars'],
-      textContent: 'generate cars',
+      classes: ['controls__button', 'controls__button--generate-cars'],
+      textContent: '+100',
+      attributes: {
+        title: 'Add 100 cars',
+      },
+      parent: 'controls',
+    },
+  },
+  {
+    key: 'startBtn',
+    value: {
+      tagName: 'button',
+      classes: ['controls__button', 'controls__button--start-race'],
+      textContent: 'race',
+      attributes: {
+        title: 'Start race',
+      },
+      parent: 'controls',
+    },
+  },
+  {
+    key: 'resetBtn',
+    value: {
+      tagName: 'button',
+      classes: ['controls__button', 'controls__button--reset-race'],
+      textContent: 'reset',
+      attributes: {
+        title: 'End race',
+      },
       parent: 'controls',
     },
   },

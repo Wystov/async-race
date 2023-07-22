@@ -11,7 +11,7 @@ export const headerElements = [
     value: {
       tagName: 'button',
       classes: ['button', 'header__button', 'header__button--garage'],
-      textContent: 'garage',
+      textContent: 'Garage',
       parent: 'header',
     },
   },
@@ -20,7 +20,7 @@ export const headerElements = [
     value: {
       tagName: 'button',
       classes: ['button', 'header__button', 'header__button--winners'],
-      textContent: 'winners',
+      textContent: 'Winners',
       parent: 'header',
     },
   },

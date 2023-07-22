@@ -64,10 +64,17 @@ export const winnersElements = [
     },
   },
   {
+    key: 'container',
+    value: {
+      classes: ['winners__container'],
+      parent: 'winners',
+    },
+  },
+  {
     key: 'controls',
     value: {
       classes: ['winners__controls'],
-      parent: 'winners',
+      parent: 'container',
     },
   },
   {
@@ -84,7 +91,7 @@ export const winnersElements = [
     value: {
       tagName: 'div',
       classes: ['controls__car'],
-      textContent: 'car',
+      textContent: 'CAR',
       parent: 'controls',
     },
   },
@@ -93,7 +100,7 @@ export const winnersElements = [
     value: {
       tagName: 'div',
       classes: ['controls__name'],
-      textContent: 'name',
+      textContent: 'NAME',
       parent: 'controls',
     },
   },
@@ -102,7 +109,7 @@ export const winnersElements = [
     value: {
       tagName: 'button',
       classes: ['controls__wins'],
-      textContent: 'wins',
+      textContent: 'WINS',
       parent: 'controls',
     },
   },
@@ -111,7 +118,7 @@ export const winnersElements = [
     value: {
       tagName: 'button',
       classes: ['controls__time'],
-      textContent: 'time',
+      textContent: 'TIME',
       parent: 'controls',
     },
   },
@@ -119,7 +126,7 @@ export const winnersElements = [
     key: 'winnerElements',
     value: {
       classes: ['winners__winner-elements'],
-      parent: 'winners',
+      parent: 'container',
     },
   },
 ];

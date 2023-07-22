@@ -6,13 +6,11 @@ import { carImage } from '../../data/car-image';
 import { carElementsData } from '../../data/page-elements.ts/garage/car-element';
 import { createCarPopupData } from '../../data/page-elements.ts/garage/create-car-popup-element';
 import { garageElements } from '../../data/page-elements.ts/garage/garage-elements';
-import { raceControlElements } from '../../data/page-elements.ts/garage/race-control-elements';
 import { ElementCreator } from '../../utils/element-creator';
 
 export class GarageView {
   public garage: ElementList = {};
   public cars: CarElement[] = [];
-  public raceControls: ElementList = {};
   public createCarPopup: ElementList = {};
 
   constructor(parent: HTMLElement) {
@@ -20,7 +18,6 @@ export class GarageView {
   }
 
   private init(parent: HTMLElement): void {
-    this.raceControls = new SectionCreator(raceControlElements, parent).getElements();
     this.garage = new SectionCreator(garageElements, parent).getElements();
     this.switchRaceBtns();
   }
@@ -45,7 +42,7 @@ export class GarageView {
   }: ContentDefaultParams = {}): void {
     const { title, currentPageEl } = this.garage;
     if (totalItems !== undefined) {
-      title.textContent = `Garage (${totalItems})`;
+      title.textContent = `Cars in garage: ${totalItems}`;
     }
     if (currentPage !== undefined && totalPages !== undefined) {
       currentPageEl.textContent = `${currentPage.toString()} / ${totalPages.toString()}`;
@@ -53,7 +50,7 @@ export class GarageView {
   }
 
   public switchRaceBtns(): void {
-    const { startBtn, resetBtn } = this.raceControls;
+    const { startBtn, resetBtn } = this.garage;
     disableButtons([resetBtn], true);
     disableButtons([startBtn], false);
   }
@@ -84,6 +81,8 @@ export class GarageView {
     this.createCarPopup = new SectionCreator(createCarPopupData, parent).getElements();
     this.changeCarPopupValues('create');
     this.createCarPopup.createBtn.addEventListener('click', callback);
+    const modal = this.createCarPopup.container;
+    if (modal instanceof HTMLDialogElement) modal.showModal();
   }
 
   public showModifyCar(data: Car, callback: (id: number) => Promise<void>): void {
@@ -150,8 +149,10 @@ export class GarageView {
   }
 
   public moveCar(animationTime: number, carImg: HTMLElement): Animation {
-    const start = `${carImg.getBoundingClientRect().left}px`;
-    const finish = `${document.body.clientWidth - carImg.clientWidth}px`;
+    const { carElements } = this.garage;
+    const padding = 10;
+    const start = '0px';
+    const finish = `${carElements.clientWidth - carImg.clientWidth - padding * 2}px`;
     const properties = [
       { transform: `translateX(${start}` },
       { transform: `translateX(${finish}` },

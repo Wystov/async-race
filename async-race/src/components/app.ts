@@ -11,17 +11,12 @@ export class App {
   private page: GarageController | WinnersController | undefined;
   private readonly state = new State();
 
-  constructor() {
+  public start(): void {
     const root = new ElementCreator({ classes: ['container'] }).getNode();
-    this.init(root);
-    document.body.append(root);
-  }
-
-  private init(root: HTMLElement): void {
     this.header = new SectionCreator(headerElements, root).getElements();
     const page = new ElementCreator({
       tagName: 'main',
-      classes: ['body'],
+      classes: ['page'],
       parent: root,
     }).getNode();
     const { garageBtn, winnersBtn } = this.header;
@@ -38,5 +33,6 @@ export class App {
       disableButtons([winnersBtn], true);
     });
     garageBtn.click();
+    document.body.append(root);
   }
 }

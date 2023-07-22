@@ -21,29 +21,10 @@ export const carElementsData = [
     },
   },
   {
-    key: 'modifyBtn',
-    value: {
-      tagName: 'button',
-      classes: ['button--modify-car'],
-      textContent: 'modify',
-      parent: 'controls',
-    },
-  },
-  {
-    key: 'deleteBtn',
-    value: {
-      tagName: 'button',
-      classes: ['button--delete-car'],
-      textContent: 'delete',
-      parent: 'controls',
-    },
-  },
-  {
     key: 'startEngineBtn',
     value: {
       tagName: 'button',
-      classes: ['button--start-engine'],
-      textContent: 'start',
+      classes: ['car__button', 'car__button--start'],
       parent: 'controls',
     },
   },
@@ -51,8 +32,23 @@ export const carElementsData = [
     key: 'stopEngineBtn',
     value: {
       tagName: 'button',
-      classes: ['button--stop-engine'],
-      textContent: 'stop',
+      classes: ['car__button', 'car__button--stop'],
+      parent: 'controls',
+    },
+  },
+  {
+    key: 'modifyBtn',
+    value: {
+      tagName: 'button',
+      classes: ['car__button', 'car__button--modify'],
+      parent: 'controls',
+    },
+  },
+  {
+    key: 'deleteBtn',
+    value: {
+      tagName: 'button',
+      classes: ['car__button', 'car__button--delete'],
       parent: 'controls',
     },
   },
@@ -60,6 +56,13 @@ export const carElementsData = [
     key: 'image',
     value: {
       classes: ['car__image'],
+      parent: 'container',
+    },
+  },
+  {
+    key: 'road',
+    value: {
+      classes: ['car__road'],
       parent: 'container',
     },
   },

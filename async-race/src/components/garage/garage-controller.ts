@@ -4,7 +4,7 @@ import { isButton } from '../../utils/type-guards';
 import { APIHandler } from '../api-handler/api-handler';
 import { GarageView } from './garage-view';
 import * as helpers from '../../utils/helpers';
-import './car.scss';
+import './garage.scss';
 import type { State } from '../state/state';
 
 export class GarageController {
@@ -55,7 +55,7 @@ export class GarageController {
       if (command === 'started') this.view.toggleCarBtns(car, command);
       if (command === 'stopped') this.view.toggleStopBtn(car);
       if (!this.raceMode) {
-        const { startBtn, resetBtn } = this.view.raceControls;
+        const { startBtn, resetBtn } = this.view.garage;
         if (isButton(startBtn)) startBtn.disabled = true;
         if (isButton(resetBtn)) resetBtn.disabled = false;
       }
@@ -70,7 +70,10 @@ export class GarageController {
       this.racePromises.push(promise);
     } catch (err) {
       ++this.state.garage.carsAtStart;
-      if (this.state.garage.carsAtStart === 7) this.view.switchRaceBtns();
+      if (this.state.garage.carsAtStart === 7) {
+        this.view.removeCarPopup();
+        this.view.switchRaceBtns();
+      }
       if (!this.raceMode) this.racePromises.length = 0;
       car.animation?.cancel();
       delete car.animation;
@@ -103,7 +106,8 @@ export class GarageController {
   private async handleWinner(id: number, time: number): Promise<void> {
     const car = await APIHandler.getCar(id);
     this.view.showWinner(car, time);
-    await this.setWinner(id, time);
+    const timeToSeconds = +(time / 1000).toFixed(2);
+    await this.setWinner(id, timeToSeconds);
   }
 
   private async setWinner(id: number, newTime: number): Promise<void> {
@@ -133,7 +137,7 @@ export class GarageController {
     });
     generateCarsBtn.addEventListener('click', this.generateCars.bind(this));
     paginationBtns.addEventListener('click', this.switchPage.bind(this));
-    const { startBtn, resetBtn } = this.view.raceControls;
+    const { startBtn, resetBtn } = this.view.garage;
     startBtn.addEventListener('click', () => {
       helpers.disableButtons([startBtn, resetBtn], true);
       this.toggleRace('started').catch(helpers.error);
@@ -237,7 +241,7 @@ export class GarageController {
   }
 
   private handleRaceReset(): void {
-    const { startBtn } = this.view.raceControls;
+    const { startBtn } = this.view.garage;
     this.raceMode = false;
     helpers.disableButtons([startBtn], false);
   }
@@ -248,7 +252,7 @@ export class GarageController {
     const { id, time } = winner;
     this.racePromises.length = 0;
     this.handleWinner(id, time).catch(helpers.error);
-    const { resetBtn } = this.view.raceControls;
+    const { resetBtn } = this.view.garage;
     helpers.disableButtons([resetBtn], false);
   }
 }

@@ -2,6 +2,7 @@ export const createCarPopupData = [
   {
     key: 'container',
     value: {
+      tagName: 'dialog',
       classes: ['car-creation__container'],
     },
   },

@@ -18,7 +18,7 @@ export class WinnersView {
   }: ContentDefaultParams = {}): void {
     const { title, currentPageEl } = this.winners;
     if (totalItems !== undefined) {
-      title.textContent = `Winners (${totalItems})`;
+      title.textContent = `Total winners: ${totalItems}`;
     }
     if (currentPage !== undefined && totalPages !== undefined) {
       currentPageEl.textContent = `${currentPage.toString()} / ${totalPages.toString()}`;

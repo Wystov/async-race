@@ -79,5 +79,7 @@ export const togglePaginationButtons = (
     case currentPage === lastPage:
       disableButtons([toFirstPage, toPrevPage], false);
       disableButtons([toNextPage, toLastPage], true);
+      break;
+    default:
   }
 };

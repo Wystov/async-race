@@ -1,6 +1,20 @@
 .winners {
+  &__title {
+    text-align: center;
+    margin: 15px 0;
+  }
+
   &__controls {
     display: flex;
+    font-weight: bold;
+  }
+
+  &__container {
+    display: grid;
+    width: fit-content;
+    grid-template-rows: 30px 1fr;
+    grid-template-columns: 1fr;
+    margin: auto;
   }
 
   &__element {
@@ -21,14 +35,37 @@
   &__name,
   &__wins,
   &__time {
-    width: 200px;
+    width: 100px;
     display: grid;
     place-items: center;
+  }
+
+  &__name {
+    width: 250px
+  }
+
+  &__wins,
+  &__time {
+    cursor: pointer;
+    color: #ffffff;
+    border: none;
+    border-top: 2px solid #ffffff;
+    background-color: transparent;
+    font-weight: bold;
+    transition: 0.3s;
+
+    &:hover {
+      transform: translateY(-2px);
+    }
+
+    &:active {
+      transform: scale(0.8);
+    }
   }
 }
 
 .element {
-  border-top: 2px solid black;
+  border-top: 2px solid #FFFFFF;
 
   &__number {
     width: 30px;
@@ -40,8 +77,12 @@
   &__name,
   &__wins,
   &__time {
-    width: 200px;
+    width: 100px;
     display: grid;
     place-items: center;
+  }
+
+  &__name {
+    width: 250px
   }
 }
