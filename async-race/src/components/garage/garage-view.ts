@@ -1,7 +1,7 @@
 import type { Car, CarElement, ContentDefaultParams, ElementList, Engine } from '../../utils/types';
 import { isButton, isHtmlElement, isInput } from '../../utils/type-guards';
 import { SectionCreator } from '../../utils/section-creator';
-import { generateName, generateColor, error, disableButtons } from '../../utils/helpers';
+import * as helpers from '../../utils/helpers';
 import { carImage } from '../../data/car-image';
 import { carElementsData } from '../../data/page-elements.ts/garage/car-element';
 import { createCarPopupData } from '../../data/page-elements.ts/garage/create-car-popup-element';
@@ -51,8 +51,8 @@ export class GarageView {
 
   public switchRaceBtns(): void {
     const { startBtn, resetBtn } = this.garage;
-    disableButtons([resetBtn], true);
-    disableButtons([startBtn], false);
+    helpers.disableButtons([resetBtn], true);
+    helpers.disableButtons([startBtn], false);
   }
 
   public toggleCarBtns(car: CarElement, command: Engine): void {
@@ -91,7 +91,7 @@ export class GarageView {
     const carElement = this.getCarElement(id ?? 0);
     if (carElement === undefined) return;
     this.showCreateCar(carElement.container, () => {
-      callback(id ?? 0).catch(error);
+      callback(id ?? 0).catch(helpers.error);
     });
     this.changeCarPopupValues('modify', { name, color });
   }
@@ -102,8 +102,8 @@ export class GarageView {
   ): void {
     const { nameInput, colorPicker, createBtn } = this.createCarPopup;
     if (!isInput(nameInput) || !isInput(colorPicker)) return;
-    nameInput.value = status === 'modify' ? props?.name ?? '' : generateName();
-    colorPicker.value = status === 'modify' ? props?.color ?? '' : generateColor();
+    nameInput.value = status === 'modify' ? props?.name ?? '' : helpers.generateName();
+    colorPicker.value = status === 'modify' ? props?.color ?? '' : helpers.generateColor();
     createBtn.textContent = status === 'modify' ? 'update' : 'create';
   }
 
@@ -178,5 +178,31 @@ export class GarageView {
       winnerPopup.remove();
       delete this.garage.winnerPopup;
     }
+  }
+
+  public disableButtonsOnRace(): void {
+    const { startBtn, resetBtn, toFirstPage, createCarBtn, overlay } = this.garage;
+    const { toLastPage, toNextPage, toPrevPage, generateCarsBtn } = this.garage;
+    helpers.disableButtons(
+      [
+        startBtn,
+        resetBtn,
+        toFirstPage,
+        toLastPage,
+        toNextPage,
+        toPrevPage,
+        createCarBtn,
+        generateCarsBtn,
+      ],
+      true
+    );
+    overlay.style.display = 'block';
+  }
+  public enableButtonsAfterRace(currentPage: number, totalPages: number): void {
+    const { startBtn, createCarBtn, generateCarsBtn, overlay, resetBtn } = this.garage;
+    overlay.style.display = 'none';
+    helpers.disableButtons([startBtn, createCarBtn, generateCarsBtn], false);
+    helpers.disableButtons([resetBtn], true);
+    helpers.togglePaginationButtons(currentPage, totalPages, this.garage);
   }
 }

@@ -90,3 +90,13 @@
   }
 
 }
+
+.overlay {
+  cursor: not-allowed;
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 49%;
+  width: 140px;
+  height: 68px;
+}

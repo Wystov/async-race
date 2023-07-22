@@ -6,6 +6,15 @@ export const garageElements = [
     },
   },
   {
+    key: 'overlay',
+    value: {
+      classes: ['overlay'],
+      attributes: {
+        title: 'Reset cars to garage first, they must be in a safe place :)',
+      },
+    },
+  },
+  {
     key: 'title',
     value: {
       tagName: 'h2',
