@@ -108,9 +108,10 @@ export class APIHandler {
 
   public static async deleteWinner(id: number): Promise<void> {
     try {
-      await fetch(`${this.baseUrl}/winners/${id}`, { method: 'DELETE' });
+      const response = await fetch(`${this.baseUrl}/winners/${id}`, { method: 'DELETE' });
+      if (!response.ok) throw new Error('This car never won, no need to delete it from winners db');
     } catch (err) {
-      console.warn(err);
+      console.warn((err as Error).message);
     }
   }
 

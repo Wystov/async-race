@@ -19,6 +19,7 @@ export class GarageController {
 
   private init(): void {
     this.addListenersToPage();
+    helpers.togglePaginationButtons(1, 1, this.view.garage);
     this.fillGarage().catch(helpers.error);
   }
 

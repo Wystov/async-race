@@ -12,12 +12,12 @@
     "outDir": "dist",
     "lib": [
       "ES2021",
-      "DOM",
+      "DOM"
     ]
   },
   "include": [
     "src/**/*.ts",
     ".eslintrc.js",
-    "webpack.config.cjs",
+    "webpack.config.cjs"
   ]
 }

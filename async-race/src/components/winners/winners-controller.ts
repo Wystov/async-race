@@ -9,6 +9,7 @@ export class WinnersController {
 
   constructor(parent: HTMLElement, private readonly state: State) {
     this.view = new WinnersView(parent);
+    helpers.togglePaginationButtons(1, 1, this.view.winners);
     this.init().catch(helpers.error);
   }
 
